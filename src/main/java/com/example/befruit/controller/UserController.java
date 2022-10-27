@@ -10,10 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.mail.MessagingException;
@@ -47,7 +44,7 @@ public class UserController {
             String content = "<p>Xin chào, </p>" + "<p>Fruit Shop xin tặng bạn voucher: <b> <h2>" + voucherCode + "</h2></b></p>"
                     + "<p>- Voucher có giá trị 50.000đ.</p>"
                     + "<p>- Voucher có thời hạn trong vòng 30 ngày kể từ khi được gửi.</p>"
-                    + "<p>- Mọi thắc mắc về voucher có thể gưỉ mail về ContactHatranShop@gmail.com để nhận được phản hồi sớm nhất!!!</p>";
+                    + "<p>- Mọi thắc mắc về voucher có thể gưỉ mail về hop@gmail.com để nhận được phản hồi sớm nhất!!!</p>";
             helper.setSubject(subject);
             helper.setText(content, true);
             mailSender.send(msg);
@@ -59,20 +56,25 @@ public class UserController {
         return false;
     }
     @PostMapping("/process_register")
-    public ResponseEntity<ResponseObject> processRegister(UserDTO user, HttpServletRequest request)
+    public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user, HttpServletRequest request)
             throws UnsupportedEncodingException, MessagingException {
-        System.out.println("săp vao register");
-        userService.register(user, getSiteURL(request));
-        System.out.println("xong register");
-        return new ResponseEntity<>(new ResponseObject("ok","dang ki thanh cong, check mail di",user), HttpStatus.OK);
+     try{
+         userService.register(user, getSiteURL(request));
+         return new ResponseEntity<>(new ResponseObject("ok","Register successful!",user), HttpStatus.OK);
+     }catch (Exception e) {
+         return new ResponseEntity<>(new ResponseObject("failed","Register failed!",e.getMessage()), HttpStatus.BAD_REQUEST);
+     }
+
 
     }
     @GetMapping("/verify")
-    public void verifyUser(@Param("code") String code) {
+    public ResponseEntity<ResponseObject> verifyUser(@Param("code") String code) {
         if (userService.verify(code)) {
-            System.out.println("verify_success");
+            return new ResponseEntity<>(new ResponseObject("ok","Successful verification!","Xác minh email thành công!"), HttpStatus.OK);
+
         } else {
-            System.out.println("verify_success");
+            return new ResponseEntity<>(new ResponseObject("","Verification failed!","Xác minh email thất bại!"), HttpStatus.BAD_REQUEST);
+
         }
     }
     private String getSiteURL(HttpServletRequest request) {

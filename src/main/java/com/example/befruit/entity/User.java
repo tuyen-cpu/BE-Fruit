@@ -27,6 +27,7 @@ public class User {
     private String verificationCode;
     private Boolean enabled;
     private String token;
+    @Column(columnDefinition = "integer default 1")
     private Integer status;
     @JsonIgnore
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)

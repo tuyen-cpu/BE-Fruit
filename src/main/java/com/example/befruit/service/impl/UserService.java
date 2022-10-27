@@ -46,14 +46,17 @@ public class UserService implements IUserService {
 
     @Override
     public void register(UserDTO userDTO, String siteURL) {
-        System.out.println("vào register");
+        User u = userRepo.findByEmail(userDTO.getEmail());
+        if (u != null ){
+            throw new RuntimeException("Email đã được đăng ký!");
+        }
+
 //        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
         userDTO.setPassword(userDTO.getPassword());
         User user = userConverter.convertToEntity(userDTO);
         String randomCode = RandomString.make(64);
         user.setVerificationCode(randomCode);
         user.setEnabled(false);
-//        user.setId(1212134);
         userRepo.save(user);
         sendVerificationEmail(user, siteURL);
 
@@ -75,16 +78,16 @@ public class UserService implements IUserService {
 
     private void sendVerificationEmail(User user, String siteURL)   {
         try{
-            String toAddress = user.getEmail()+"địa chỉ nảyAA";
+            String toAddress = user.getEmail();
             System.out.println(toAddress);
-            String fromAddress = "Your email address";
-            String senderName = "Your company name";
+            String fromAddress = "tuyencpu@gmail.com";
+            String senderName = "FRUIT SHOP";
             String subject = "Please verify your registration";
             String content = "Dear [[name]],<br>"
                     + "Please click the link below to verify your registration:<br>"
                     + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
                     + "Thank you,<br>"
-                    + "Your company name.";
+                    + "FRUIT SHOP.";
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -93,8 +96,8 @@ public class UserService implements IUserService {
             helper.setTo(toAddress);
             helper.setSubject(subject);
 
-            content = content.replace("[[name]]", user.getLastName()+user.getFirstName());
-            String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
+            content = content.replace("[[name]]", user.getLastName()+" "+user.getFirstName());
+            String verifyURL = "http://localhost:4200" + "/account/verify?code=" + user.getVerificationCode();
 
             content = content.replace("[[URL]]", verifyURL);
 

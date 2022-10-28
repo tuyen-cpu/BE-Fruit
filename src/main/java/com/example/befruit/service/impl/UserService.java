@@ -2,6 +2,7 @@ package com.example.befruit.service.impl;
 
 import com.example.befruit.converter.UserConverter;
 import com.example.befruit.dto.UserDTO;
+import com.example.befruit.entity.ERole;
 import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
@@ -51,23 +52,27 @@ public class UserService implements IUserService {
 
     @Override
     public void register(UserDTO userDTO, String siteURL) {
-        User u = userRepo.findByEmail(userDTO.getEmail());
-        if (u != null ){
+
+        if (userRepo.existsByEmail(userDTO.getEmail())){
             throw new RuntimeException("Email đã được đăng ký!");
         }
+       /* if (userRepo.existsByUsername(userDTO.getEmail())){
+            throw new RuntimeException("Username đã được đăng ký!");
+        }*/
 
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
         userDTO.setPassword(encodedPassword);
 
         User user = userConverter.convertToEntity(userDTO);
         String randomCode = RandomString.make(64);
-        Role role = roleRepo.findByName("client");
+        System.out.println(ERole.CLIENT.name());
+        Role  role = roleRepo.findByName(ERole.CLIENT.name());
         user.addRole(role);
+
         user.setVerificationCode(randomCode);
         user.setEnabled(false);
 
         userRepo.save(user);
-
         sendVerificationEmail(user, siteURL);
 
     }

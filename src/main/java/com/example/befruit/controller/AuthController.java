@@ -1,15 +1,23 @@
 package com.example.befruit.controller;
 
+import com.example.befruit.dto.LoginDTO;
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.entity.ResponseObject;
-import com.example.befruit.repo.UserRepo;
+import com.example.befruit.entity.Role;
+import com.example.befruit.repo.RoleRepo;
+import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
-import com.example.befruit.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -17,44 +25,36 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
+@RequestMapping("/api/auth")
+public class AuthController {
     @Autowired
     private IUserService userService;
     @Autowired
-    private JavaMailSender mailSender;
+    private RoleRepo roleRepo;
 
-    @GetMapping("/user")
-    public ResponseEntity<ResponseObject> getUserById() {
-        UserDTO user = userService.getUserById();
-//        sendEmail("18130277@st.hcmuaf.edu.vn","BANMOI");
-        return new ResponseEntity<>(new ResponseObject("ok","get thanh cong",user), HttpStatus.OK);
+    @Autowired
+    AuthenticationManager authenticationManager;
 
-    }
-    private boolean sendEmail(String email, String voucherCode) {
-        MimeMessage msg = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(msg);
-
-        try {
-            helper.setFrom("hello@gmail.com", "Fruit Shop");
-            helper.setTo(email);
-            String subject = "E-voucher";
-            String content = "<p>Xin chào, </p>" + "<p>Fruit Shop xin tặng bạn voucher: <b> <h2>" + voucherCode + "</h2></b></p>"
-                    + "<p>- Voucher có giá trị 50.000đ.</p>"
-                    + "<p>- Voucher có thời hạn trong vòng 30 ngày kể từ khi được gửi.</p>"
-                    + "<p>- Mọi thắc mắc về voucher có thể gưỉ mail về hop@gmail.com để nhận được phản hồi sớm nhất!!!</p>";
-            helper.setSubject(subject);
-            helper.setText(content, true);
-            mailSender.send(msg);
-            return true;
-
-        } catch (UnsupportedEncodingException | MessagingException e) {
-            e.printStackTrace();
+    @PostMapping("/login")
+    public ResponseEntity<ResponseObject> login(@RequestBody LoginDTO loginDTO) {
+        try{
+            System.out.println("đây0");
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserDetail userDetail = (UserDetail) authentication.getPrincipal();
+            return new ResponseEntity<>(
+                    new ResponseObject("ok","Login successful!", new UserDTO(userDetail.getUser().getId(), userDetail.getUsername(),
+                         userDetail.getUsername(), "","firstName", "lastName",null)), HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(new ResponseObject("failed","login failed!","Tài khoản hoặc mật khẩu khôn hợp lệ!"), HttpStatus.BAD_REQUEST);
         }
-        return false;
+
     }
+
     @PostMapping("/process_register")
     public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user, HttpServletRequest request)
             throws UnsupportedEncodingException, MessagingException {
@@ -81,4 +81,5 @@ public class UserController {
         String siteURL = request.getRequestURL().toString();
         return siteURL.replace(request.getServletPath(), "");
     }
+
 }

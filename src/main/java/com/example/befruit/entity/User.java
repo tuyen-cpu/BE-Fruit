@@ -20,6 +20,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String email;
+    private String userName;
     private String password;
     private String firstName;
     private String lastName;
@@ -34,5 +35,8 @@ public class User {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     List<Role> roles = new ArrayList<>();
     public void addRole(Role role) {
-        this.roles.add(role);}
+        System.out.println("vào add role");
+        this.roles.add(role);
+        System.out.println("vào add role thnafh công");
+    }
 }

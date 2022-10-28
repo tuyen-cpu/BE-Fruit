@@ -2,7 +2,9 @@ package com.example.befruit.service.impl;
 
 import com.example.befruit.converter.UserConverter;
 import com.example.befruit.dto.UserDTO;
+import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
+import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.repo.UserRepo;
 import com.example.befruit.service.IUserService;
 import net.bytebuddy.utility.RandomString;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -21,12 +24,14 @@ public class UserService implements IUserService {
     @Autowired
     private UserRepo userRepo;
     @Autowired
+    private RoleRepo roleRepo;
+    @Autowired
     private UserConverter userConverter;
 
     @Autowired
     private JavaMailSender mailSender;
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTO add(User user) {
@@ -51,13 +56,18 @@ public class UserService implements IUserService {
             throw new RuntimeException("Email đã được đăng ký!");
         }
 
-//        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-        userDTO.setPassword(userDTO.getPassword());
+        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+        userDTO.setPassword(encodedPassword);
+
         User user = userConverter.convertToEntity(userDTO);
         String randomCode = RandomString.make(64);
+        Role role = roleRepo.findByName("client");
+        user.addRole(role);
         user.setVerificationCode(randomCode);
         user.setEnabled(false);
+
         userRepo.save(user);
+
         sendVerificationEmail(user, siteURL);
 
     }

@@ -1,5 +1,6 @@
 package com.example.befruit.sercurity;
 
+import com.example.befruit.sercurity.jwt.AuthEntryPointJwt;
 import com.example.befruit.sercurity.service.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +28,8 @@ import java.util.Arrays;
 public class WebSecurityConfig{
     @Autowired
     UserDetailService userDetailService;
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -58,12 +62,15 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        http.authorizeRequests()
-                .antMatchers("/**").permitAll()
+        http.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated()
                 .and().csrf().disable().cors().configurationSource(request -> corsConfiguration);
 
 
-        http.headers().frameOptions().disable();
+        http.headers().frameOptions().sameOrigin();
 
     return http.build();
 }

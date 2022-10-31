@@ -57,9 +57,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDTO getUserById() {
-
-        return null;
+    public UserDTO getUserById(long id) {
+        User u = userRepo.findById(id).get();
+UserDTO user = new UserDTO();
+user.setId(u.getId());
+user.setEmail(u.getEmail());
+        return user;
     }
 
 

@@ -9,7 +9,7 @@ public interface IUserService {
     UserDTO add(User user);
      List<UserDTO> getUsers();
      User getUserByToken(String token);
-     UserDTO getUserById();
+     UserDTO getUserById(long id);
     String getTokenByUserId(Long id);
     void register(UserDTO userDTO,String siteURL);
     Boolean verify(String verificationCode);

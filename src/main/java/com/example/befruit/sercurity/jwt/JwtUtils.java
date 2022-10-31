@@ -85,6 +85,7 @@ public class JwtUtils {
     }
 
     public String generateTokenFromUsername(String username) {
+        System.out.println(new Date((new Date()).getTime() + jwtExpirationMs));
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
@@ -95,7 +96,7 @@ public class JwtUtils {
 
     private ResponseCookie generateCookie(String name, String value, String path,long expireTime) {
         ResponseCookie cookie = ResponseCookie.from(name, value).path(path)
-                .maxAge(expireTime)
+//                .maxAge(expireTime)
                 .httpOnly(true).build();
         return cookie;
     }

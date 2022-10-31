@@ -7,6 +7,7 @@ import net.minidev.json.annotate.JsonIgnore;
 
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String email;
     private String userName;
     private String password;
@@ -28,6 +29,8 @@ public class User {
     private String verificationCode;
     private Boolean enabled;
     private String token;
+    @Column(name = "expiry_date")
+    private Instant expiryDate;
     @Column(columnDefinition = "integer default 1")
     private Integer status;
     @JsonIgnore

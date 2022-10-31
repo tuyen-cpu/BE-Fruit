@@ -10,6 +10,7 @@ import com.example.befruit.repo.UserRepo;
 import com.example.befruit.service.IUserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,9 +20,15 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class UserService implements IUserService {
+    @Value("${tuyen.app.jwtRefreshExpirationMs}")
+    private Long refreshTokenDurationMs;
     @Autowired
     private UserRepo userRepo;
     @Autowired
@@ -45,10 +52,17 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User getUserByToken(String token) {
+        return userRepo.findByToken(token);
+    }
+
+    @Override
     public UserDTO getUserById() {
 
-        return userConverter.convertToDto(userRepo.findById(1).get());
+        return null;
     }
+
+
 
     @Override
     public void register(UserDTO userDTO, String siteURL) {
@@ -68,7 +82,8 @@ public class UserService implements IUserService {
         System.out.println(ERole.CLIENT.name());
         Role  role = roleRepo.findByName(ERole.CLIENT.name());
         user.addRole(role);
-
+        user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        user.setToken(UUID.randomUUID().toString());
         user.setVerificationCode(randomCode);
         user.setEnabled(false);
 
@@ -76,6 +91,22 @@ public class UserService implements IUserService {
         sendVerificationEmail(user, siteURL);
 
     }
+    @Override
+      public  String getTokenByUserId(Long id){
+                User user = userRepo.findById(id).get();
+            user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+            user.setToken(UUID.randomUUID().toString());
+            userRepo.save(user);
+            return user.getToken();
+        }
+//    public boolean verifyExpiration(String token,Instant expiryDate) {
+//        if (expiryDate.compareTo(Instant.now()) < 0) {
+//            refreshTokenRepository.delete(token);
+//            throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
+//        }
+//
+//        return token;
+//    }
 
     @Override
     public Boolean verify(String verificationCode) {

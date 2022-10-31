@@ -14,7 +14,7 @@ public class UserDetailService implements UserDetailsService {
     @Autowired
     UserRepo userRepo;
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) {
         User user = userRepo.findByEmailAndStatus(email,1);
         if(user==null) {
             throw new UsernameNotFoundException("Email "+email+" chưa được đăng ký!");

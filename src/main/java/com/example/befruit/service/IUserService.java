@@ -8,7 +8,9 @@ import java.util.List;
 public interface IUserService {
     UserDTO add(User user);
      List<UserDTO> getUsers();
+     User getUserByToken(String token);
      UserDTO getUserById();
+    String getTokenByUserId(Long id);
     void register(UserDTO userDTO,String siteURL);
     Boolean verify(String verificationCode);
 }

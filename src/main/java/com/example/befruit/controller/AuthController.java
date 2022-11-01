@@ -8,6 +8,10 @@ import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.sercurity.jwt.JwtUtils;
+import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
+import com.example.befruit.sercurity.jwt.payload.request.TokenRefreshRequest;
+import com.example.befruit.sercurity.jwt.payload.response.JwtResponse;
+import com.example.befruit.sercurity.jwt.payload.response.TokenRefreshResponse;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,25 +58,20 @@ public class AuthController {
                     .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetail userDetail = (UserDetail) authentication.getPrincipal();
-            //generate jwtcookie
-            ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetail);
 
-            //generate refresh jwtcookie
+            //generate access token
+            String jwt = jwtUtils.generateJwtToken(userDetail);
 
-            String reFreshToken = userService.getTokenByUserId(userDetail.getUser().getId());
-            ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(reFreshToken);
+            //generate refresh token
+            String refreshToken = userService.getTokenByUserId(userDetail.getUser().getId());
 
             List<String> roles = userDetail.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
-
-            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                    .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                    .body(new ResponseObject("ok","Login successful!",new UserInformation(userDetail.getUser().getId(),
-                            userDetail.getUser().getUserName(),
-                            userDetail.getUser().getEmail(),
-                            roles)));
+            return ResponseEntity.ok()
+                    .body(new ResponseObject("ok","Login successful!",
+                            new JwtResponse(jwt,refreshToken,userDetail.getUser().getId(),userDetail.getUser().getUserName(),userDetail.getUser().getEmail(),roles)));
 
         }catch (Exception e) {
             return  ResponseEntity.badRequest().body(new ResponseObject("failed","login failed!","Tài khoản hoặc mật khẩu khôn hợp lệ!"));
@@ -83,34 +82,31 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+
                 .body(new ResponseObject("ok","Logout successful!",""));
     }
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
-        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+    public ResponseEntity<ResponseObject> refreshToken( @RequestBody TokenRefreshRequest request) {
+        System.out.println("-----Enter refresh token------");
+        String refreshToken = request.getRefreshToken();
 
         if ((refreshToken != null) && (refreshToken.length() > 0)) {
-           User user = userService.getUserByToken(refreshToken);
-            System.out.println("id:_"+user.getId());
-//            return refreshTokenService.findByToken(refreshToken)
-//                    .map(refreshTokenService::verifyExpiration)
-//                    .map(RefreshToken::getUser)
-//                    .map(user -> {
-//                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
-//
-//                        return ResponseEntity.ok()
-//                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-//                                .header(HttpHeaders.SET_COOKIE, refreshToken)
-//                                .body(new MessageResponse("Token is refreshed successfully!"));
-//                    })
-//                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
-//                            "Refresh token is not in database!"));
-        }else{
-            return ResponseEntity.badRequest().body("KO còn");
-        }
+           try{
+               User user = userService.getUserByToken(refreshToken);
+               String token = jwtUtils.generateTokenFromUsername(user.getEmail());
+               System.out.println("tạo lại refresh token xong"+token);
+               return ResponseEntity.ok().body(new ResponseObject("ok","Refresh token successful",new TokenRefreshResponse(token,refreshToken)));
 
-        return ResponseEntity.badRequest().body("lll");
+           }catch (Exception e){
+               return ResponseEntity.badRequest().body(new ResponseObject("failed","Refresh token successful","Ko tim thấy token"));
+           }
+        }
+            return ResponseEntity.badRequest().body(new ResponseObject("failed","Refresh token failed!","Refresh token empty!"));
+
+
+
     }
     @PostMapping("/process_register")
     public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user, HttpServletRequest request)

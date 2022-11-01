@@ -13,4 +13,5 @@ public interface IUserService {
     String getTokenByUserId(Long id);
     void register(UserDTO userDTO,String siteURL);
     Boolean verify(String verificationCode);
+
 }

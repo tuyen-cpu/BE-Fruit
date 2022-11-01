@@ -20,11 +20,11 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<ResponseObject> user() {
         try{
-            UserDTO user=  userService.getUserById(25);
+            UserDTO user=  userService.getUserById(52);
             return ResponseEntity.ok()
                     .body(new ResponseObject("ok","Success user!",user));
         }catch (Exception e){
-            return ResponseEntity.ok()
+            return ResponseEntity.badRequest()
                     .body(new ResponseObject("ok","get failed",""));
         }
 

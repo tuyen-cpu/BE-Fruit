@@ -29,11 +29,13 @@ public class JwtUtils {
     @Value("${tuyen.app.jwtRefreshCookieName}")
     private String jwtRefreshCookie;
 
-    public ResponseCookie generateJwtCookie(UserDetail userPrincipal) {
-        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        return generateCookie(jwtCookie, jwt, "/api",24*60*60);
+//    public ResponseCookie generateJwtToken(UserDetail userPrincipal) {
+//        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
+//        return generateCookie(jwtCookie, jwt, "/api",24*60*60);
+//    }
+    public String generateJwtToken(UserDetail userPrincipal) {
+        return generateTokenFromUsername(userPrincipal.getUsername());
     }
-
     public ResponseCookie generateJwtCookie(User user) {
         String jwt = generateTokenFromUsername(user.getUserName());
         return generateCookie(jwtCookie, jwt, "/api",24*60*60);
@@ -85,7 +87,7 @@ public class JwtUtils {
     }
 
     public String generateTokenFromUsername(String username) {
-        System.out.println(new Date((new Date()).getTime() + jwtExpirationMs));
+        System.out.println("expire time access token:"+new Date((new Date()).getTime() + jwtExpirationMs));
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())

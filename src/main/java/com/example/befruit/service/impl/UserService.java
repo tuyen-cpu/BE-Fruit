@@ -7,6 +7,7 @@ import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.repo.UserRepo;
+import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
 import com.example.befruit.service.IUserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -53,15 +55,24 @@ public class UserService implements IUserService {
 
     @Override
     public User getUserByToken(String token) {
-        return userRepo.findByToken(token);
+        User user =userRepo.findByToken(token);
+        if(user.getExpiryDate().compareTo(Instant.now())<0){
+            user.setToken(null);
+            user.setExpiryDate(null);
+            userRepo.save(user);
+            throw new TokenRefreshException(token, "Refresh token was expired. Please make a new signin request");
+
+        }
+        return user;
     }
 
+    @Transactional
     @Override
     public UserDTO getUserById(long id) {
         User u = userRepo.findById(id).get();
-UserDTO user = new UserDTO();
-user.setId(u.getId());
-user.setEmail(u.getEmail());
+        UserDTO user = new UserDTO();
+        user.setId(u.getId());
+        user.setEmail(u.getEmail());
         return user;
     }
 
@@ -82,9 +93,10 @@ user.setEmail(u.getEmail());
 
         User user = userConverter.convertToEntity(userDTO);
         String randomCode = RandomString.make(64);
-        System.out.println(ERole.CLIENT.name());
         Role  role = roleRepo.findByName(ERole.CLIENT.name());
         user.addRole(role);
+        user.setStatus(1);
+        user.setUserName(UUID.randomUUID().toString());
         user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         user.setToken(UUID.randomUUID().toString());
         user.setVerificationCode(randomCode);
@@ -92,7 +104,7 @@ user.setEmail(u.getEmail());
 
         userRepo.save(user);
         sendVerificationEmail(user, siteURL);
-
+        System.out.println("Guửi mail xxong");
     }
     @Override
       public  String getTokenByUserId(Long id){
@@ -128,7 +140,7 @@ user.setEmail(u.getEmail());
     private void sendVerificationEmail(User user, String siteURL)   {
         try{
             String toAddress = user.getEmail();
-            System.out.println(toAddress);
+            System.out.println("Gửi tới: "+toAddress);
             String fromAddress = "tuyencpu@gmail.com";
             String senderName = "FRUIT SHOP";
             String subject = "Please verify your registration";
@@ -151,9 +163,11 @@ user.setEmail(u.getEmail());
             content = content.replace("[[URL]]", verifyURL);
 
             helper.setText(content, true);
-
+            System.out.println("Chuân bị gửi mail");
             mailSender.send(message);
+            System.out.println("Gửi mail xong");
         } catch (UnsupportedEncodingException | MessagingException e) {
+            System.out.println("gui mail lỗi");
             e.printStackTrace();
         }
 

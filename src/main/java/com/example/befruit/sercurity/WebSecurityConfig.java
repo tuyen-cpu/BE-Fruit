@@ -1,6 +1,7 @@
 package com.example.befruit.sercurity;
 
 import com.example.befruit.sercurity.jwt.AuthEntryPointJwt;
+import com.example.befruit.sercurity.jwt.AuthTokenFilter;
 import com.example.befruit.sercurity.service.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -34,7 +36,10 @@ public class WebSecurityConfig{
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 @Bean
 public DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -62,15 +67,17 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        http.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+        http.csrf().disable().cors().configurationSource(request -> corsConfiguration).and()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
-                .and().csrf().disable().cors().configurationSource(request -> corsConfiguration);
+                .and();
 
-
-        http.headers().frameOptions().sameOrigin();
+//        http.headers().frameOptions().sameOrigin();
+    http.authenticationProvider(authenticationProvider());
+    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
 }

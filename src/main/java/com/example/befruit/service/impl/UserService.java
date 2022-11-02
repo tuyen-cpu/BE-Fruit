@@ -137,6 +137,16 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
+    public boolean checkExistByEmail(String email) {
+        return userRepo.existsByEmail(email);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
+
     private void sendVerificationEmail(User user, String siteURL)   {
         try{
             String toAddress = user.getEmail();

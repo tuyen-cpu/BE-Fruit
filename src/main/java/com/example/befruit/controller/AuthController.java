@@ -1,6 +1,7 @@
 package com.example.befruit.controller;
 
 import com.example.befruit.dto.LoginDTO;
+import com.example.befruit.dto.TokenDTO;
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.UserInformation;
 import com.example.befruit.entity.ResponseObject;
@@ -9,12 +10,19 @@ import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.sercurity.jwt.JwtUtils;
 import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
+import com.example.befruit.sercurity.jwt.payload.request.LoginRequest;
 import com.example.befruit.sercurity.jwt.payload.request.TokenRefreshRequest;
 import com.example.befruit.sercurity.jwt.payload.response.JwtResponse;
 import com.example.befruit.sercurity.jwt.payload.response.TokenRefreshResponse;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+
+import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,11 +42,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials="true")
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials="true")
 
 @RestController
 @RequestMapping("/api/auth")
@@ -51,11 +60,15 @@ public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Value("${google.clientId}")
+    private String googleClientId;
+    @Value("${google.secret}")
+    private String password;
     @PostMapping("/login")
-    public ResponseEntity<ResponseObject> login(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<ResponseObject> login(@RequestBody LoginRequest loginRequest) {
         try{
             Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetail userDetail = (UserDetail) authentication.getPrincipal();
 
@@ -63,7 +76,7 @@ public class AuthController {
             String jwt = jwtUtils.generateJwtToken(userDetail);
 
             //generate refresh token
-            String refreshToken = userService.getTokenByUserId(userDetail.getUser().getId());
+            String refreshToken = userService.getTokenByUserId(userDetail.getId());
 
             List<String> roles = userDetail.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
@@ -71,14 +84,40 @@ public class AuthController {
 
             return ResponseEntity.ok()
                     .body(new ResponseObject("ok","Login successful!",
-                            new JwtResponse(jwt,refreshToken,userDetail.getUser().getId(),userDetail.getUser().getUserName(),userDetail.getUser().getEmail(),roles)));
+                            new JwtResponse(jwt,refreshToken,userDetail.getId(),userDetail.getUsername(),userDetail.getEmail(),roles)));
 
         }catch (Exception e) {
             return  ResponseEntity.badRequest().body(new ResponseObject("failed","login failed!","Tài khoản hoặc mật khẩu khôn hợp lệ!"));
         }
 
     }
+@PostMapping("/google")
+public ResponseEntity<ResponseObject> google(@RequestBody TokenDTO tokenDTO) throws IOException {
+    System.out.println(tokenDTO.getValue());
+        final NetHttpTransport transport = new NetHttpTransport();
+        final GsonFactory jacksonFactory = GsonFactory.getDefaultInstance();
+    GoogleIdTokenVerifier.Builder verifier = new GoogleIdTokenVerifier.Builder(transport,jacksonFactory);
+    final GoogleIdToken googleIdToken =GoogleIdToken.parse(verifier.getJsonFactory(),tokenDTO.getValue());
+    final GoogleIdToken.Payload payload = googleIdToken.getPayload();
+    UserDetail userDetail=null;
+//if(userService.checkExistByEmail(payload.getEmail())){
+userDetail = UserDetail.build(userService.getUserByEmail(payload.getEmail()));
+    //generate access token
+    String jwt = jwtUtils.generateJwtToken(userDetail);
 
+    //generate refresh token
+    String refreshToken = userService.getTokenByUserId(userDetail.getId());
+
+    List<String> roles = userDetail.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
+//}else{
+//    LoginRequest loginRequest = new LoginRequest(payload.getEmail(),password);
+//    this.login(loginRequest);
+//}
+
+    return  ResponseEntity.ok().body(new ResponseObject("ok","Login with google success!",new JwtResponse(jwt,refreshToken,userDetail.getId(),userDetail.getUsername(),userDetail.getEmail(),roles)));
+}
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();

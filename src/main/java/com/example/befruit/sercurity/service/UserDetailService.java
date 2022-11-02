@@ -19,6 +19,6 @@ public class UserDetailService implements UserDetailsService {
         if(user==null) {
             throw new UsernameNotFoundException("Email "+email+" chưa được đăng ký!");
         }
-        return new UserDetail(user);
+        return UserDetail.build(user);
     }
 }

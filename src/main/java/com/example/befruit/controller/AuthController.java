@@ -54,7 +54,8 @@ import java.util.stream.Collectors;
 public class AuthController {
     @Autowired
     private IUserService userService;
-
+    @Value("${server.frontend}")
+    private String urlFrontend;
     @Autowired
     JwtUtils jwtUtils;
     @Autowired
@@ -93,31 +94,52 @@ public class AuthController {
     }
 @PostMapping("/google")
 public ResponseEntity<ResponseObject> google(@RequestBody TokenDTO tokenDTO) throws IOException {
-    System.out.println(tokenDTO.getValue());
+
+    try {
         final NetHttpTransport transport = new NetHttpTransport();
         final GsonFactory jacksonFactory = GsonFactory.getDefaultInstance();
-    GoogleIdTokenVerifier.Builder verifier = new GoogleIdTokenVerifier.Builder(transport,jacksonFactory);
-    final GoogleIdToken googleIdToken =GoogleIdToken.parse(verifier.getJsonFactory(),tokenDTO.getValue());
-    final GoogleIdToken.Payload payload = googleIdToken.getPayload();
-    UserDetail userDetail=null;
-//if(userService.checkExistByEmail(payload.getEmail())){
-userDetail = UserDetail.build(userService.getUserByEmail(payload.getEmail()));
-    //generate access token
-    String jwt = jwtUtils.generateJwtToken(userDetail);
+        GoogleIdTokenVerifier.Builder verifier = new GoogleIdTokenVerifier.Builder(transport,jacksonFactory);
+        final GoogleIdToken googleIdToken =GoogleIdToken.parse(verifier.getJsonFactory(),tokenDTO.getValue());
+        final GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
-    //generate refresh token
-    String refreshToken = userService.getTokenByUserId(userDetail.getId());
+        User uu =userService.getUserByEmail(payload.getEmail());
+        UserDetail userDetail;
+        String jwt ="";
+        String refreshToken ="";
+        List<String> roles =null;
+        if(uu==null){
+            System.out.println("chưa ton tai mai: "+payload.getEmail());
+            UserDTO user = new UserDTO();
+            user.setEmail(payload.getEmail());
+            user.setPassword(password);
+            user.setFirstName("Random");
+            userService.register(user,urlFrontend,false);
+            userDetail= UserDetail.build(userService.getUserByEmail(user.getEmail()));
+            jwt = jwtUtils.generateJwtToken(userDetail);
+            refreshToken = userService.getTokenByUserId(userDetail.getId());
+            roles = userDetail.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-    List<String> roles = userDetail.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toList());
-//}else{
-//    LoginRequest loginRequest = new LoginRequest(payload.getEmail(),password);
-//    this.login(loginRequest);
-//}
+        }else{
+            userDetail= UserDetail.build(uu);
+            jwt = jwtUtils.generateJwtToken(userDetail);
+            refreshToken = userService.getTokenByUserId(userDetail.getId());
+            roles = userDetail.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+        }
 
-    return  ResponseEntity.ok().body(new ResponseObject("ok","Login with google success!",new JwtResponse(jwt,refreshToken,userDetail.getId(),userDetail.getUsername(),userDetail.getEmail(),roles)));
+        return  ResponseEntity.ok().body(new ResponseObject("ok","Login with google success!",new JwtResponse(jwt,refreshToken,userDetail.getId(),userDetail.getUsername(),userDetail.getEmail(),roles)));
+
+
+    }catch (Exception e){
+        return  ResponseEntity.badRequest().body(new ResponseObject("faild",e.getMessage(),""));
+
+    }
+
 }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
@@ -148,10 +170,10 @@ userDetail = UserDetail.build(userService.getUserByEmail(payload.getEmail()));
 
     }
     @PostMapping("/process_register")
-    public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user, HttpServletRequest request)
+    public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user)
             throws UnsupportedEncodingException, MessagingException {
      try{
-         userService.register(user, getSiteURL(request));
+         userService.register(user,urlFrontend,true);
          return  ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok","Register successful!",user));
      }catch (Exception e) {
          return  ResponseEntity.badRequest().body(new ResponseObject("failed","Register failed!",e.getMessage()));
@@ -169,9 +191,9 @@ userDetail = UserDetail.build(userService.getUserByEmail(payload.getEmail()));
 
         }
     }
-    private String getSiteURL(HttpServletRequest request) {
-        String siteURL = request.getRequestURL().toString();
-        return siteURL.replace(request.getServletPath(), "");
-    }
+//    private String getSiteURL(HttpServletRequest request) {
+//        String siteURL = request.getRequestURL().toString();
+//        return siteURL.replace(request.getServletPath(), "");
+//    }
 
 }

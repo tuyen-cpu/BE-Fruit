@@ -11,7 +11,7 @@ public interface IUserService {
      User getUserByToken(String token);
      UserDTO getUserById(long id);
     String getTokenByUserId(Long id);
-    void register(UserDTO userDTO,String siteURL);
+    void register(UserDTO userDTO,String siteURL,boolean isSendMail);
     Boolean verify(String verificationCode);
     boolean checkExistByEmail(String email);
     User getUserByEmail(String email);

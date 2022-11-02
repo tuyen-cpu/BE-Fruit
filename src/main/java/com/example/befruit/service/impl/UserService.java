@@ -79,9 +79,13 @@ public class UserService implements IUserService {
 
 
     @Override
-    public void register(UserDTO userDTO, String siteURL) {
-
-        if (userRepo.existsByEmail(userDTO.getEmail())){
+    public void register(UserDTO userDTO, String siteURL,boolean isSendMail) {
+        User userCheck =userRepo.findByEmail(userDTO.getEmail());
+        if(userCheck!=null &&!userCheck.getEnabled()){
+            sendVerificationEmail(userConverter.convertToEntity(userDTO), siteURL);
+            return;
+        }
+        if (userCheck!=null &&userCheck.getEnabled()){
             throw new RuntimeException("Email đã được đăng ký!");
         }
        /* if (userRepo.existsByUsername(userDTO.getEmail())){
@@ -100,11 +104,15 @@ public class UserService implements IUserService {
         user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         user.setToken(UUID.randomUUID().toString());
         user.setVerificationCode(randomCode);
-        user.setEnabled(false);
 
+
+        if(isSendMail){
+            user.setEnabled(false);
+            sendVerificationEmail(user, siteURL);
+        }else{
+            user.setEnabled(true);
+        }
         userRepo.save(user);
-        sendVerificationEmail(user, siteURL);
-        System.out.println("Guửi mail xxong");
     }
     @Override
       public  String getTokenByUserId(Long id){
@@ -168,7 +176,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
 
             content = content.replace("[[name]]", user.getLastName()+" "+user.getFirstName());
-            String verifyURL = "http://localhost:4200" + "/account/verify?code=" + user.getVerificationCode();
+            String verifyURL = siteURL + "/account/verify?code=" + user.getVerificationCode();
 
             content = content.replace("[[URL]]", verifyURL);
 

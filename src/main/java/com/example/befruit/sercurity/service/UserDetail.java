@@ -11,13 +11,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-@Data
 
 public class UserDetail implements UserDetails {
     private Long id;
     private String username;
     private String email;
-    @JsonIgnore
+//    @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     public UserDetail(Long id, String username, String email, String password,
@@ -39,14 +38,21 @@ public class UserDetail implements UserDetails {
     }
     @Override
     public String getPassword() {
-        return getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return email;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -66,5 +72,6 @@ public class UserDetail implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 
 }

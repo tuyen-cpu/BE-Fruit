@@ -92,17 +92,17 @@ public class UserService implements IUserService {
             throw new RuntimeException("Username đã được đăng ký!");
         }*/
 
-        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-        userDTO.setPassword(encodedPassword);
+        userDTO.setPassword(encodedPassword(userDTO.getPassword()));
 
         User user = userConverter.convertToEntity(userDTO);
-        String randomCode = RandomString.make(64);
+
         Role  role = roleRepo.findByName(ERole.CLIENT.name());
         user.addRole(role);
         user.setStatus(1);
         user.setUserName(UUID.randomUUID().toString());
         user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         user.setToken(UUID.randomUUID().toString());
+        String randomCode = RandomString.make(64);
         user.setVerificationCode(randomCode);
 
 
@@ -114,6 +114,21 @@ public class UserService implements IUserService {
         }
         userRepo.save(user);
     }
+    private String encodedPassword(String password){
+       return passwordEncoder.encode(password);
+    }
+    @Override
+    public void forgotPassword(String email,String siteURL) {
+        User user = userRepo.findByEmailAndStatus(email,1);
+        if(user==null){
+            throw new RuntimeException("Email không tồn tại!");
+        }
+        String randomCode = RandomString.make(64);
+        user.setVerificationCode(randomCode);
+        userRepo.save(user);
+        sendMailForgotPassword(user,siteURL);
+    }
+
     @Override
       public  String getTokenByUserId(Long id){
                 User user = userRepo.findById(id).get();
@@ -137,13 +152,22 @@ public class UserService implements IUserService {
 
         if (user == null || user.getEnabled()) {
             return false;
-        } else {
-            user.setVerificationCode(null);
+        }
             user.setEnabled(true);
             userRepo.save(user);
             return true;
-        }
+
     }
+    @Transactional
+    @Override
+    public void resetPassword(String verificationCode, String password) {
+       User user= userRepo.findByVerificationCode(verificationCode);
+       if(user==null) throw new RuntimeException("Tài khoản không tồn tại!");
+       user.setPassword(encodedPassword(password));
+       user.setVerificationCode(null);
+       userRepo.save(user);
+    }
+
 
     @Override
     public boolean checkExistByEmail(String email) {
@@ -154,7 +178,38 @@ public class UserService implements IUserService {
     public User getUserByEmail(String email) {
         return userRepo.findByEmail(email);
     }
+    private void sendMailForgotPassword(User user, String siteURL)   {
+        try{
+            String toAddress = user.getEmail();
+            System.out.println("Gửi tới: "+toAddress);
+            String fromAddress = "tuyencpu@gmail.com";
+            String senderName = "FRUIT SHOP";
+            String subject = "Reset your password.";
+            String content = "Dear [[name]],<br>"
+                    + "Please click the link below to reset your password:<br>"
+                    + "<h3><a href=\"[[URL]]\" target=\"_self\">RESET NOW</a></h3>"
+                    + "Thank you,<br>"
+                    + "FRUIT SHOP.";
 
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+
+            content = content.replace("[[name]]", user.getLastName()+" "+user.getFirstName());
+            String verifyURL = siteURL + "/account/reset?code=" + user.getVerificationCode();
+
+            content = content.replace("[[URL]]", verifyURL);
+
+            helper.setText(content, true);
+            mailSender.send(message);
+        } catch (UnsupportedEncodingException | MessagingException e) {
+            e.printStackTrace();
+        }
+
+    }
     private void sendVerificationEmail(User user, String siteURL)   {
         try{
             String toAddress = user.getEmail();

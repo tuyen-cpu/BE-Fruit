@@ -11,6 +11,7 @@ import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.sercurity.jwt.JwtUtils;
 import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
 import com.example.befruit.sercurity.jwt.payload.request.LoginRequest;
+import com.example.befruit.sercurity.jwt.payload.request.ResetPasswordRequest;
 import com.example.befruit.sercurity.jwt.payload.request.TokenRefreshRequest;
 import com.example.befruit.sercurity.jwt.payload.response.JwtResponse;
 import com.example.befruit.sercurity.jwt.payload.response.TokenRefreshResponse;
@@ -195,5 +196,30 @@ public ResponseEntity<ResponseObject> google(@RequestBody TokenDTO tokenDTO) thr
 //        String siteURL = request.getRequestURL().toString();
 //        return siteURL.replace(request.getServletPath(), "");
 //    }
+@GetMapping("/forgot-password")
+public ResponseEntity<ResponseObject> processForgotPassword(@RequestParam String email) {
+       try{
+           userService.forgotPassword(email,urlFrontend);
+           return ResponseEntity.ok().body(new ResponseObject("ok","Sent mail to reset password","Please check mail to reset password!"));
 
+       }catch (Exception e){
+           return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+       }
+
+}
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ResponseObject> changePassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        try{
+
+            userService.resetPassword(resetPasswordRequest.getVerifyCode(),resetPasswordRequest.getPassword());
+            return ResponseEntity.ok().body(new ResponseObject("ok","Reset password successful!","Reset password successful!"));
+
+        }catch (Exception e){
+
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
 }

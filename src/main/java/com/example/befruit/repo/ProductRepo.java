@@ -14,4 +14,6 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
 //    @Query("SELECT p FROM Product p WHERE p.category.id = :id")
     Page<Product> findAllByCategoryIdAndPriceLessThanEqual(Long id,Long price,Pageable pageable );
     Page<Product> findAllByPriceLessThanEqual(Long price,Pageable pageable );
+    @Query("SELECT p FROM Product p WHERE UPPER(p.name) LIKE %?1%  or upper(p.category.name) like %?1% ")
+    Page<Product> findAllByNameOrCategoryName(String q, Pageable pageable);
 }

@@ -38,4 +38,18 @@ public class ProductController {
 
     }
 }
+    @GetMapping("/search")
+    public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "key",required = false) String key,
+                                                                     @RequestParam(name = "page",defaultValue = "0") int page,
+                                                                     @RequestParam(name = "size",defaultValue = "10") int size){
+
+        try{
+            Page<ProductResponse> products=productService.search(key,page,size);
+            return ResponseEntity.ok().body(new ResponseObject("ok","Search with key "+key+" product successful!",products));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
 }

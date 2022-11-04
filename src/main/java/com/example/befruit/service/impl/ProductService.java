@@ -33,4 +33,10 @@ public class ProductService implements IProductService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return productConverter.convertToResponse(productRepo.findAllByPriceLessThanEqual(price,pageable));
     }
+
+    @Override
+    public Page<ProductResponse> search(String key, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return productConverter.convertToResponse(productRepo.findAllByNameOrCategoryName(key,pageable));
+    }
 }

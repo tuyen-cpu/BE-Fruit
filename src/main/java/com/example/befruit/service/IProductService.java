@@ -5,4 +5,5 @@ import org.springframework.data.domain.Page;
 
 public interface IProductService {
     Page<ProductResponse> getAllByCategoryId(Long id,Long price,Integer page, Integer size);
+    Page<ProductResponse> getAll(Long price,Integer page, Integer size);
 }

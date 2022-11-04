@@ -27,4 +27,10 @@ public class ProductService implements IProductService {
         System.out.println("ra đây 27");
         return productConverter.convertToResponse(products);
     }
+
+    @Override
+    public Page<ProductResponse> getAll(Long price,Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return productConverter.convertToResponse(productRepo.findAllByPriceLessThanEqual(price,pageable));
+    }
 }

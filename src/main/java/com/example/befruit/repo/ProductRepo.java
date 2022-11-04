@@ -13,4 +13,5 @@ import org.springframework.stereotype.Repository;
 public interface ProductRepo extends JpaRepository<Product, Long> {
 //    @Query("SELECT p FROM Product p WHERE p.category.id = :id")
     Page<Product> findAllByCategoryIdAndPriceLessThanEqual(Long id,Long price,Pageable pageable );
+    Page<Product> findAllByPriceLessThanEqual(Long price,Pageable pageable );
 }

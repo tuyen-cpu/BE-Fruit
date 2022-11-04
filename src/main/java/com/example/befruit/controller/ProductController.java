@@ -23,7 +23,14 @@ public class ProductController {
                                                  @RequestParam(name = "page",defaultValue = "0") int page,
                                                  @RequestParam(name = "size",defaultValue = "10") int size){
     try{
-        Page<ProductResponse> products=productService.getAllByCategoryId(categoryId,price,page,size);
+        Page<ProductResponse> products=null;
+        if(categoryId==0){
+            products=productService.getAll(price,page,size);
+        }else{
+            System.out.println("có cate");
+            products=productService.getAllByCategoryId(categoryId,price,page,size);
+        }
+
         return ResponseEntity.ok().body(new ResponseObject("ok","Get product successful!",products));
 
     }catch (Exception e){

@@ -1,0 +1,69 @@
+package com.example.befruit.controller;
+
+import com.example.befruit.dto.request.CartItemRequest;
+import com.example.befruit.dto.response.CartItemResponse;
+import com.example.befruit.dto.response.ProductResponse;
+import com.example.befruit.entity.ResponseObject;
+import com.example.befruit.service.ICartService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials="true")
+@RestController
+@RequestMapping("/api/cart")
+public class CartItemController {
+    @Autowired
+    private ICartService cartService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseObject> getAllByUserId(@PathVariable("id") Long id,
+                                                                     @RequestParam(name = "page",defaultValue = "0") int page,
+                                                                     @RequestParam(name = "size",defaultValue = "10") int size){
+
+        try{
+            Page<CartItemResponse> products=cartService.getByUserId(id,page,size);
+            return ResponseEntity.ok().body(new ResponseObject("ok","Get all cart item with user id: "+id+" successful!",products));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
+    @PostMapping("/add")
+    public ResponseEntity<ResponseObject> add(@RequestBody CartItemRequest cartItemRequest){
+        try{
+            System.out.println("cao add");
+           CartItemResponse cartItemResponse=cartService.add(cartItemRequest);
+            System.out.println(cartItemResponse.getId()+"  id");
+           return ResponseEntity.ok().body(new ResponseObject("ok","Add prodcuct to cart successful!",cartItemResponse));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
+    @PutMapping ("/update")
+    public ResponseEntity<ResponseObject> update(@RequestBody CartItemRequest cartItemRequest){
+        try{
+
+            CartItemResponse cartItemResponse=cartService.update(cartItemRequest);
+            return ResponseEntity.ok().body(new ResponseObject("ok","Updated!",cartItemResponse));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseObject> delete(@PathVariable(name = "id") Long id){
+        try{
+            cartService.delete(id);
+            return ResponseEntity.ok().body(new ResponseObject("ok","Deleted!",id));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
+}

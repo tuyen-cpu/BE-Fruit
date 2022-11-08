@@ -73,6 +73,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/product/**").permitAll()
+                .antMatchers("/api/cart/add").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and();

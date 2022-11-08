@@ -37,6 +37,9 @@ public class User {
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     List<Role> roles = new ArrayList<>();
+
+//    @OneToMany(cascade = CascadeType.ALL)
+//    private List<CartItem> cartItems;
     public void addRole(Role role) {
         System.out.println("vào add role");
         this.roles.add(role);

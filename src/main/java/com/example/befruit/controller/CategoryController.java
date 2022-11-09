@@ -2,6 +2,7 @@ package com.example.befruit.controller;
 
 import com.example.befruit.dto.CategoryDTO;
 import com.example.befruit.dto.ImageDTO;
+import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,8 @@ public class CategoryController {
     @GetMapping("/all")
     public ResponseEntity<ResponseObject> getAll( ){
         try{
-            List<CategoryDTO> categoryDTOS = categoryService.getAll();
+
+            List<CategoryDTO> categoryDTOS = categoryService.getAll(EStatus.ACTIVE.getName());
             return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",categoryDTOS));
 
         }catch (Exception e){

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ICategory{
     List<CategoryDTO> getAll();
+    List<CategoryDTO> getAll(Integer status);
 }

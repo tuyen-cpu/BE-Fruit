@@ -19,4 +19,10 @@ public class CategoryService implements ICategory {
     public List<CategoryDTO> getAll() {
         return categoryRepo.findAll().stream().map(entity->categoryConverter.convertToDto(entity)).collect(Collectors.toList());
     }
+
+    @Override
+    public List<CategoryDTO> getAll(Integer status) {
+        return categoryRepo.findAllByStatus(status).stream().map(entity->categoryConverter.convertToDto(entity)).collect(Collectors.toList());
+    }
+
 }

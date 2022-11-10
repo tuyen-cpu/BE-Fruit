@@ -3,26 +3,26 @@ package com.example.befruit.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "role")
-public class Role implements Serializable {
+@Table(name = "voucher")
+public class Voucher implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
+    private String code;
+    private Long cost;
+    private Date startDate;
+    private Date endDate;
+    private Integer times;
     private Integer status;
-    @JsonIgnore
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    List<User> users = new ArrayList<>();
+
+
 }

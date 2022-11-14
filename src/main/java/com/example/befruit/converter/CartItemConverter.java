@@ -1,6 +1,7 @@
 package com.example.befruit.converter;
 
 import com.example.befruit.dto.CategoryDTO;
+import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.request.CartItemRequest;
 import com.example.befruit.dto.response.CartItemResponse;
 import com.example.befruit.dto.response.ProductResponse;
@@ -18,7 +19,13 @@ public class CartItemConverter {
     @Autowired
     private ModelMapper modelMapper;
     public CartItemResponse convertToResponse(CartItem entity){
-        return modelMapper.map(entity, CartItemResponse.class);
+        CartItemResponse cartItemResponse = modelMapper.map(entity, CartItemResponse.class);
+        ProductResponse productResponse= modelMapper.map(entity.getProduct(),ProductResponse.class);
+        ImageDTO imageDTO = modelMapper.map(entity.getProduct().getImages().get(0),ImageDTO.class);
+        productResponse.setImage(imageDTO);
+        cartItemResponse.setProduct(productResponse);
+        return cartItemResponse;
+
     }
     public CartItemResponse convertToResponse(CartItemRequest entity){
         return modelMapper.map(entity, CartItemResponse.class);

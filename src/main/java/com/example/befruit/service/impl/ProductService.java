@@ -2,6 +2,7 @@ package com.example.befruit.service.impl;
 
 import com.example.befruit.converter.ProductConverter;
 import com.example.befruit.dto.response.ProductResponse;
+import com.example.befruit.entity.Image;
 import com.example.befruit.entity.Product;
 import com.example.befruit.repo.ProductRepo;
 import com.example.befruit.service.IProductService;
@@ -20,11 +21,8 @@ public class ProductService implements IProductService {
     private ProductConverter productConverter;
     @Override
     public Page<ProductResponse> getAllByCategoryId(Long id,Long price,Integer page, Integer size) {
-        System.out.println("vào đây:23");
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        System.out.println("vào đây:25");
         Page<Product> products = productRepo.findAllByCategoryIdAndPriceLessThanEqual(id,price,pageable);
-        System.out.println("ra đây 27");
         return productConverter.convertToResponse(products);
     }
 
@@ -39,4 +37,5 @@ public class ProductService implements IProductService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return productConverter.convertToResponse(productRepo.findAllByNameOrCategoryName(key,pageable));
     }
+
 }

@@ -66,4 +66,15 @@ public class CartItemController {
 
         }
     }
+    @DeleteMapping("/delete/user/{userId}")
+    public ResponseEntity<ResponseObject> deleteByUserId(@PathVariable(name = "userId") Long userId){
+        try{
+            cartService.deleteByUserId(userId);
+            return ResponseEntity.ok().body(new ResponseObject("ok","Deleted!",""));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+        }
+    }
 }

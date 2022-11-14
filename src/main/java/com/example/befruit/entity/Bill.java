@@ -4,6 +4,8 @@ import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,6 +23,8 @@ public class Bill implements Serializable {
     private Long shippingCost;
     private Long total;
     private String description;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     private Date createdDate;
     @Column(name="status")
     private Integer status;
@@ -44,7 +48,10 @@ public class Bill implements Serializable {
     @ManyToOne(targetEntity = Voucher.class)
     @JoinColumn(name = "voucher_id")
     private Voucher voucher;
-
+@PrePersist
+    private void onCreate(){
+    createdDate=new Date();
+}
 //
 //    @ManyToOne(targetEntity = ShippingStatus.class)
 //    @JoinColumn(name = "shipping_status_id", nullable = false)

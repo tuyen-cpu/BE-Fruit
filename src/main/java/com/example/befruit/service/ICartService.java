@@ -10,4 +10,6 @@ public interface ICartService {
     CartItemResponse add(CartItemRequest cartItemRequest);
     CartItemResponse update(CartItemRequest cartItemRequest);
     void delete(Long id);
+    void deleteByUserId(Long userId);
+
 }

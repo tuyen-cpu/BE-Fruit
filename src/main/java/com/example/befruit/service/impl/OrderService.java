@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,45 +35,12 @@ public class OrderService implements IOrderService {
    @Transactional
     @Override
     public Boolean addOrder(OrderRequest orderRequest) {
-//       try{
-//           AddressDTO addressResponse =orderRequest.getAddress();
-//           Address address=null;
-//           if(addressResponse.getId()==null){
-//               address=addressRepo.save(addressConverter.convertToEntity(addressResponse));
-//               System.out.println("Tuyền: "+address);
-//           }else{
-//               address = addressConverter.convertToEntity(addressResponse);
-//           }
-//           System.out.println(address.toString());
-//
-//           ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
-//           shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
-//
-//           Bill order = new Bill();
-//           order.setStatus(EStatus.ACTIVE.getName());
-//           order.setShippingStatus(shippingStatus);
-//           order.setAddress(address);
-////           order.setVoucher();
-//           Bill orderSaved=  orderRepo.save(order);
-//           List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream().map(dto->{
-//               dto.setOrderId(orderSaved.getId());
-//               return orderDetailConverter.convertToEntity(dto);
-//           }).collect(Collectors.toList());
-//           orderDetails.forEach(e->{
-//
-//               orderDetailRepo.save(e);
-//           });
-//
-//           return true;
-//       }catch (Exception e){
-//          throw new RuntimeException(e.getMessage());
-//       }
+
        try{
            AddressDTO addressResponse =orderRequest.getAddress();
            Address address=null;
            if(addressResponse.getId()==null){
                address=addressRepo.save(addressConverter.convertToEntity(addressResponse));
-               System.out.println("Tuyền: "+address);
            }else{
                address = addressConverter.convertToEntity(addressResponse);
            }
@@ -85,16 +53,21 @@ public class OrderService implements IOrderService {
            order.setStatus(EStatus.ACTIVE.getName());
            order.setShippingStatus(shippingStatus);
            order.setAddress(address);
-//           order.setVoucher();
+           order.setDescription(orderRequest.getDescription());
+            long total = 0L;
 
-           List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream().map(dto->{
+           List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream().map(dto->orderDetailConverter.convertToEntity(dto)).collect(Collectors.toList());
+           orderDetails.forEach(e->{
+               e.setBill(order);
 
-               return orderDetailConverter.convertToEntity(dto);
-           }).collect(Collectors.toList());
-           orderDetails.forEach(e->e.setBill(order));
-
+           });
+           for (OrderDetail orderDetail: orderDetails) {
+               System.out.println(orderDetail.getQuantity()+"_"+orderDetail.getPrice());
+               total+=(orderDetail.getPrice()-orderDetail.getPrice()*orderDetail.getDiscount()/100)*orderDetail.getQuantity();
+           }
+            order.setTotal(total);
            order.setOrderDetails(orderDetails);
-           Bill orderSaved=  orderRepo.save(order);
+           orderRepo.save(order);
 
            return true;
        }catch (Exception e){

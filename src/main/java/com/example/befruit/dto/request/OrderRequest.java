@@ -13,7 +13,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderRequest implements Serializable { private Long id;
+public class OrderRequest implements Serializable {
+    private Long id;
     private Long shippingCost;
     private String description;
     private AddressDTO address;

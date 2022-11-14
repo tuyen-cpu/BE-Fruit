@@ -1,5 +1,6 @@
 package com.example.befruit.dto.response;
 
+import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.entity.Category;
 import com.example.befruit.entity.Product;
 import lombok.AllArgsConstructor;
@@ -20,4 +21,5 @@ public class ProductResponse {
     private Integer quantity;
     private Integer status;
     private CategoryResponse category;
+    private ImageDTO image;
 }

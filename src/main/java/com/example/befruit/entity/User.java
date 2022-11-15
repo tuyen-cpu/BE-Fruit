@@ -34,8 +34,9 @@ public class User implements Serializable {
     private Instant expiryDate;
     @Column(columnDefinition = "integer default 1")
     private Integer status;
-    @JsonIgnore
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+//    @JsonIgnore
+    @ManyToMany
+            (cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     List<Role> roles = new ArrayList<>();
 

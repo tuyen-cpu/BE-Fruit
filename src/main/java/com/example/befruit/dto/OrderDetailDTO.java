@@ -1,5 +1,7 @@
 package com.example.befruit.dto;
 
+import com.example.befruit.dto.response.ProductResponse;
+import com.example.befruit.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,6 @@ public class OrderDetailDTO {
     private Long price;
     private Integer quantity;
     private Integer discount;
-    private Long productId;
+    private ProductResponse product;
     private Long billId;
 }

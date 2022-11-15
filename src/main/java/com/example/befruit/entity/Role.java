@@ -23,6 +23,6 @@ public class Role implements Serializable {
     private String name;
     private Integer status;
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     List<User> users = new ArrayList<>();
 }

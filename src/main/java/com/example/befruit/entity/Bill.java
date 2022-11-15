@@ -48,10 +48,10 @@ public class Bill implements Serializable {
     @ManyToOne(targetEntity = Voucher.class)
     @JoinColumn(name = "voucher_id")
     private Voucher voucher;
-@PrePersist
-    private void onCreate(){
-    createdDate=new Date();
-}
+    @PrePersist
+        private void onCreate(){
+        createdDate=new Date();
+    }
 //
 //    @ManyToOne(targetEntity = ShippingStatus.class)
 //    @JoinColumn(name = "shipping_status_id", nullable = false)

@@ -1,5 +1,9 @@
 package com.example.befruit.service;
 
-public interface IOrderDetailService {
+import com.example.befruit.dto.OrderDetailDTO;
 
+import java.util.List;
+
+public interface IOrderDetailService {
+List<OrderDetailDTO> getAllByOrderId(Long orderId);
 }

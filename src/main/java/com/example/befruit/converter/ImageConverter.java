@@ -8,13 +8,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ImageConverter {
-    @Autowired
-    private ModelMapper modelMapper;
-    public ImageDTO convertToDto(Image entity){
-        return modelMapper.map(entity, ImageDTO.class);
-    }
+	@Autowired
+	private ModelMapper modelMapper;
 
-    public Image convertToEntity(ImageDTO dto){
-        return modelMapper.map(dto, Image.class);
-    }
+	public ImageDTO convertToDto(Image entity) {
+		return modelMapper.map(entity, ImageDTO.class);
+	}
+
+	public Image convertToEntity(ImageDTO dto) {
+		return modelMapper.map(dto, Image.class);
+	}
 }

@@ -12,9 +12,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
-    private Long id;
-    private Long total;
-    private Date createdDate;
-    private ShippingStatus shippingStatus;
-    private Address address;
+	private Long id;
+	private Long total;
+	private Date createdDate;
+	private ShippingStatus shippingStatus;
+	private Address address;
 }

@@ -12,8 +12,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemRequest implements Serializable {
-    private Long id;
-    private Integer quantity;
-    private Long productId;
-    private Long userId;
+	private Long id;
+	private Integer quantity;
+	private Long productId;
+	private Long userId;
 }

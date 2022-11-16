@@ -1,4 +1,5 @@
 package com.example.befruit.dto.request;
+
 import com.example.befruit.dto.AddressDTO;
 import com.example.befruit.dto.OrderDetailDTO;
 import com.example.befruit.entity.OrderDetail;
@@ -14,10 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest implements Serializable {
-    private Long id;
-    private Long shippingCost;
-    private String description;
-    private AddressDTO address;
-    private List<OrderDetailDTO> orderDetails = new ArrayList<>();
+	private Long id;
+	private Long shippingCost;
+	private String description;
+	private AddressDTO address;
+	private List<OrderDetailDTO> orderDetails = new ArrayList<>();
 
 }

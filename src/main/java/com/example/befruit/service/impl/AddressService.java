@@ -13,18 +13,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AddressService implements IAddressService {
-    @Autowired
-    private AddressConverter addressConverter;
-    @Autowired
-    private AddressRepo addressRepo;
-    @Override
-    public Page<AddressDTO> getAllByUserId(Long userId, Integer status, Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        return addressConverter.convertToDTO(addressRepo.findAllByUserIdAndStatus(userId,status,pageable));
-    }
+	@Autowired
+	private AddressConverter addressConverter;
+	@Autowired
+	private AddressRepo addressRepo;
 
-    @Override
-    public AddressDTO get(Long id) {
-        return addressConverter.convertToDTO(addressRepo.findById(id).get());
-    }
+	@Override
+	public Page<AddressDTO> getAllByUserId(Long userId, Integer status, Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return addressConverter.convertToDTO(addressRepo.findAllByUserIdAndStatus(userId, status, pageable));
+	}
+
+	@Override
+	public AddressDTO get(Long id) {
+		return addressConverter.convertToDTO(addressRepo.findById(id).get());
+	}
 }

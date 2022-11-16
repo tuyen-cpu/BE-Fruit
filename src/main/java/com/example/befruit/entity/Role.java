@@ -16,13 +16,13 @@ import java.util.List;
 @Entity
 @Table(name = "role")
 public class Role implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String name;
-    private Integer status;
-    @JsonIgnore
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    List<User> users = new ArrayList<>();
+	private String name;
+	private Integer status;
+	@JsonIgnore
+	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+	List<User> users = new ArrayList<>();
 }

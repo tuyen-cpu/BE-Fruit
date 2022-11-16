@@ -11,19 +11,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AddressConverter {
-    @Autowired
-    private ModelMapper modelMapper;
+	@Autowired
+	private ModelMapper modelMapper;
 
-    public Address convertToEntity(AddressDTO addressDTO) {
-        return modelMapper.map(addressDTO,Address.class);
-    }
-    public AddressDTO convertToDTO(Address address) {
-        return modelMapper.map(address,AddressDTO.class);
-    }
-    public Page<AddressDTO> convertToDTO(Page<Address> pageEntity){
-        if (pageEntity == null) {
-            return null;
-        }
-        return pageEntity.map(this::convertToDTO);
-    }
+	public Address convertToEntity(AddressDTO addressDTO) {
+		return modelMapper.map(addressDTO, Address.class);
+	}
+
+	public AddressDTO convertToDTO(Address address) {
+		return modelMapper.map(address, AddressDTO.class);
+	}
+
+	public Page<AddressDTO> convertToDTO(Page<Address> pageEntity) {
+		if (pageEntity == null) {
+			return null;
+		}
+		return pageEntity.map(this::convertToDTO);
+	}
 }

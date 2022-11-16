@@ -10,12 +10,13 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemResponse {
-    private Long id;
-    private Integer quantity;
-    private ProductResponse product;
-    private Long userId;
+	private Long id;
+	private Integer quantity;
+	private ProductResponse product;
+	private Long userId;
 }

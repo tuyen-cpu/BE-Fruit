@@ -1,20 +1,20 @@
 package com.example.befruit.dto;
 
 public enum SocialProvider {
-    FACEBOOK("facebook"),
-    TWITTER("twitter"),
-    LINKEDIN("linkedin"),
-    GOOGLE("google"),
-    GITHUB("github"),
-    LOCAL("local");
+	FACEBOOK("facebook"),
+	TWITTER("twitter"),
+	LINKEDIN("linkedin"),
+	GOOGLE("google"),
+	GITHUB("github"),
+	LOCAL("local");
 
-    private String providerType;
+	private String providerType;
 
-    public String getProviderType() {
-        return providerType;
-    }
+	public String getProviderType() {
+		return providerType;
+	}
 
-    SocialProvider(final String providerType) {
-        this.providerType = providerType;
-    }
+	SocialProvider(final String providerType) {
+		this.providerType = providerType;
+	}
 }

@@ -12,18 +12,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class ImageService implements IImageService {
-    @Autowired
-    private ImageConverter imageConverter;
-    @Autowired
-    private ImageRepo imageRepo;
+	@Autowired
+	private ImageConverter imageConverter;
+	@Autowired
+	private ImageRepo imageRepo;
 
-    @Override
-    public List<ImageDTO> getAllByProductId(Long id) {
-        return imageRepo.findAllByProductId(id).stream().map(entity->imageConverter.convertToDto(entity)).collect(Collectors.toList());
-    }
+	@Override
+	public List<ImageDTO> getAllByProductId(Long id) {
+		return imageRepo.findAllByProductId(id).stream().map(entity -> imageConverter.convertToDto(entity)).collect(Collectors.toList());
+	}
 
-    @Override
-    public ImageDTO getByProductId(Long id) {
-        return imageConverter.convertToDto(imageRepo.findTopByProductId(id));
-    }
+	@Override
+	public ImageDTO getByProductId(Long id) {
+		return imageConverter.convertToDto(imageRepo.findTopByProductId(id));
+	}
 }

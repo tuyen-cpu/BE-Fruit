@@ -14,42 +14,43 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
-@Autowired
-    private ProductService productService;
+	@Autowired
+	private ProductService productService;
 
-@GetMapping("/all")
-    public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "categoryId",required = false) long categoryId,
-                                                                     @RequestParam(name = "price", required = false) long price,
-                                                 @RequestParam(name = "page",defaultValue = "0") int page,
-                                                 @RequestParam(name = "size",defaultValue = "10") int size){
-    try{
-        Page<ProductResponse> products=null;
-        if(categoryId==0){
-            products=productService.getAll(price,page,size);
-        }else{
-            System.out.println("có cate");
-            products=productService.getAllByCategoryId(categoryId,price,page,size);
-        }
+	@GetMapping("/all")
+	public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "categoryId", required = false) long categoryId,
+																																	 @RequestParam(name = "price", required = false) long price,
+																																	 @RequestParam(name = "page", defaultValue = "0") int page,
+																																	 @RequestParam(name = "size", defaultValue = "10") int size) {
+		try {
+			Page<ProductResponse> products = null;
+			if (categoryId == 0) {
+				products = productService.getAll(price, page, size);
+			} else {
+				System.out.println("có cate");
+				products = productService.getAllByCategoryId(categoryId, price, page, size);
+			}
 
-        return ResponseEntity.ok().body(new ResponseObject("ok","Get product successful!",products));
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", products));
 
-    }catch (Exception e){
-        return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 
-    }
-}
-    @GetMapping("/search")
-    public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "key",required = false) String key,
-                                                                     @RequestParam(name = "page",defaultValue = "0") int page,
-                                                                     @RequestParam(name = "size",defaultValue = "10") int size){
+		}
+	}
 
-        try{
-            Page<ProductResponse> products=productService.search(key,page,size);
-            return ResponseEntity.ok().body(new ResponseObject("ok","Search with key "+key+" product successful!",products));
+	@GetMapping("/search")
+	public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "key", required = false) String key,
+																																	 @RequestParam(name = "page", defaultValue = "0") int page,
+																																	 @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+		try {
+			Page<ProductResponse> products = productService.search(key, page, size);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Search with key " + key + " product successful!", products));
 
-        }
-    }
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+	}
 }

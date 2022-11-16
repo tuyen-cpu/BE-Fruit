@@ -9,17 +9,18 @@ import lombok.NoArgsConstructor;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDTO implements Serializable {
-    private Long id;
-    private String city;
-    private String district;
-    private String ward;
-    private String street;
-    private String description;
-    private Integer status;
-    private Long userId;
+	private Long id;
+	private String city;
+	private String district;
+	private String ward;
+	private String street;
+	private String description;
+	private Integer status;
+	private Long userId;
 
 }

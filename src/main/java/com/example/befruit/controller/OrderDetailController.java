@@ -15,17 +15,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/order-detail")
 public class OrderDetailController {
-    @Autowired
-    private IOrderDetailService orderDetailService;
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseObject> getOrderDetailsById(@PathVariable(name ="id" ,required = false) long id){
-        try{
-            List<OrderDetailDTO> orderResponses = orderDetailService.getAllByOrderId(id);
-            return ResponseEntity.ok().body(new ResponseObject("ok","Get order detail successful!",orderResponses));
+  @Autowired
+  private IOrderDetailService orderDetailService;
+  @GetMapping("/{id}")
+  public ResponseEntity<ResponseObject> getOrderDetailsById(@PathVariable(name ="id" ,required = false) long id){
+    try{
+      List<OrderDetailDTO> orderResponses = orderDetailService.getAllByOrderId(id);
+      return ResponseEntity.ok().body(new ResponseObject("ok","Get order detail successful!",orderResponses));
 
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
 
-        }
     }
+  }
 }

@@ -10,5 +10,5 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TokenDTO implements Serializable {
-    private String value;
+	private String value;
 }

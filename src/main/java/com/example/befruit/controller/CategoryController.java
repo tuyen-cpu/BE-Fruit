@@ -1,7 +1,6 @@
 package com.example.befruit.controller;
 
 import com.example.befruit.dto.CategoryDTO;
-import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.CategoryService;
@@ -16,19 +15,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/category")
 public class CategoryController {
-    @Autowired
-    private CategoryService categoryService;
-    @GetMapping("/all")
-    public ResponseEntity<ResponseObject> getAll( ){
-        try{
+	@Autowired
+	private CategoryService categoryService;
 
-            List<CategoryDTO> categoryDTOS = categoryService.getAll(EStatus.ACTIVE.getName());
-            return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",categoryDTOS));
+	@GetMapping("/all")
+	public ResponseEntity<ResponseObject> getAll() {
+		try {
 
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+			List<CategoryDTO> categoryDTOS = categoryService.getAll(EStatus.ACTIVE.getName());
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Get image successful!", categoryDTOS));
 
-        }
-    }
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+	}
 
 }

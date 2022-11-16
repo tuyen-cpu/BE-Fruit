@@ -20,76 +20,79 @@ import java.util.Optional;
 @Service
 public class CartItemService implements ICartService {
 
-    @Autowired
-    private CartItemRepo cartItemRepo;
-    @Autowired
-    private CartItemConverter cartItemConverter;
+	@Autowired
+	private CartItemRepo cartItemRepo;
+	@Autowired
+	private CartItemConverter cartItemConverter;
 
-    @Autowired
-    private ProductRepo productRepo;
-    @Override
-    public Page<CartItemResponse> getByUserId(Long userId,Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        return cartItemConverter.convertToResponse(cartItemRepo.findAllByUserId(userId,pageable));
-    }
+	@Autowired
+	private ProductRepo productRepo;
 
-    @Override
-    public CartItemResponse add(CartItemRequest cartItemRequest) {
-        Product product =getProductById(cartItemRequest.getProductId());
-        Integer quantityProduct =product.getQuantity();
-        if(quantityProduct<cartItemRequest.getQuantity()){
-            throw new RuntimeException("Quantity of product is not enough");
-        }
+	@Override
+	public Page<CartItemResponse> getByUserId(Long userId, Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return cartItemConverter.convertToResponse(cartItemRepo.findAllByUserId(userId, pageable));
+	}
 
-        Optional<CartItem> cartItemDB = cartItemRepo.findByProductIdAndUserId(cartItemRequest.getProductId(),cartItemRequest.getUserId());
-        if(cartItemDB.isPresent()){
-            CartItem newCartItem =cartItemDB.get();
-            if(quantityProduct>=cartItemRequest.getQuantity()+newCartItem.getQuantity()){
+	@Override
+	public CartItemResponse add(CartItemRequest cartItemRequest) {
+		Product product = getProductById(cartItemRequest.getProductId());
+		Integer quantityProduct = product.getQuantity();
+		if (quantityProduct < cartItemRequest.getQuantity()) {
+			throw new RuntimeException("Quantity of product is not enough");
+		}
 
-                newCartItem.setQuantity(newCartItem.getQuantity()+cartItemRequest.getQuantity());
-                CartItem add =cartItemRepo.save(newCartItem);
+		Optional<CartItem> cartItemDB = cartItemRepo.findByProductIdAndUserId(cartItemRequest.getProductId(), cartItemRequest.getUserId());
+		if (cartItemDB.isPresent()) {
+			CartItem newCartItem = cartItemDB.get();
+			if (quantityProduct >= cartItemRequest.getQuantity() + newCartItem.getQuantity()) {
 
-                return cartItemConverter.convertToResponse(add);
-            }else{
-                throw new RuntimeException("Quantity of product is not enough");
-            }
-        }
+				newCartItem.setQuantity(newCartItem.getQuantity() + cartItemRequest.getQuantity());
+				CartItem add = cartItemRepo.save(newCartItem);
 
-        if(quantityProduct>=cartItemRequest.getQuantity()){
-            CartItem cartItem = cartItemConverter.convertToEntity(cartItemRequest);
-            Product product1 = productRepo.findById(cartItem.getProduct().getId()).get();
-            cartItem.setProduct(product1);
-            CartItem add =cartItemRepo.save(cartItem);
+				return cartItemConverter.convertToResponse(add);
+			} else {
+				throw new RuntimeException("Quantity of product is not enough");
+			}
+		}
+
+		if (quantityProduct >= cartItemRequest.getQuantity()) {
+			CartItem cartItem = cartItemConverter.convertToEntity(cartItemRequest);
+			Product product1 = productRepo.findById(cartItem.getProduct().getId()).get();
+			cartItem.setProduct(product1);
+			CartItem add = cartItemRepo.save(cartItem);
 
 //            System.out.println(add.toString());
-            return cartItemConverter.convertToResponse(add);
-        }else{
-            throw new RuntimeException("Quantity of product is not enough");
-        }
-    }
-    private Product getProductById(Long id){
-       return  productRepo.findById(id).get();
-    }
-    @Override
-    public CartItemResponse update(CartItemRequest cartItemRequest) {
-       Product product = getProductById(cartItemRequest.getProductId());
-        Integer quantityProduct =product.getQuantity();
-        if(quantityProduct<cartItemRequest.getQuantity()){
-            throw new RuntimeException("Quantity of product is not enough");
-        }
+			return cartItemConverter.convertToResponse(add);
+		} else {
+			throw new RuntimeException("Quantity of product is not enough");
+		}
+	}
 
-            return cartItemConverter.convertToResponse(cartItemRepo.save(cartItemConverter.convertToEntity(cartItemRequest)));
+	private Product getProductById(Long id) {
+		return productRepo.findById(id).get();
+	}
+
+	@Override
+	public CartItemResponse update(CartItemRequest cartItemRequest) {
+		Product product = getProductById(cartItemRequest.getProductId());
+		Integer quantityProduct = product.getQuantity();
+		if (quantityProduct < cartItemRequest.getQuantity()) {
+			throw new RuntimeException("Quantity of product is not enough");
+		}
+
+		return cartItemConverter.convertToResponse(cartItemRepo.save(cartItemConverter.convertToEntity(cartItemRequest)));
 
 
-    }
+	}
 
-    @Override
-    public void delete(Long id) {
-         cartItemRepo.deleteById(id);
-    }
+	@Override
+	public void delete(Long id) {
+		cartItemRepo.deleteById(id);
+	}
 
-    @Override
-    public void deleteByUserId(Long userId) {
-        cartItemRepo.deleteAllByUserId(userId);
-    }
+	@Override
+	public void deleteByUserId(Long userId) {
+		cartItemRepo.deleteAllByUserId(userId);
+	}
 }

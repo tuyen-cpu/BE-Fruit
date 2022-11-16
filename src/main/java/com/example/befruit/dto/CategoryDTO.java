@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDTO implements Serializable {
-    private Long id;
-    private String name;
-    private Integer status;
+	private Long id;
+	private String name;
+	private Integer status;
 }

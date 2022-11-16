@@ -8,13 +8,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CategoryConverter {
-    @Autowired
-    private ModelMapper modelMapper;
-    public CategoryDTO convertToDto(Category entity){
-        return modelMapper.map(entity, CategoryDTO.class);
-    }
+	@Autowired
+	private ModelMapper modelMapper;
 
-    public Category convertToEntity(CategoryDTO dto){
-        return modelMapper.map(dto, Category.class);
-    }
+	public CategoryDTO convertToDto(Category entity) {
+		return modelMapper.map(entity, CategoryDTO.class);
+	}
+
+	public Category convertToEntity(CategoryDTO dto) {
+		return modelMapper.map(dto, Category.class);
+	}
 }

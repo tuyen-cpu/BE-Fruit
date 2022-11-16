@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInformation implements Serializable {
-    private Long id;
-    private String username;
-    private String email;
-    private List<String> roles;
+	private Long id;
+	private String username;
+	private String email;
+	private List<String> roles;
 }

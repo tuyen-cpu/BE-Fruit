@@ -13,22 +13,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials="true")
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
 public class UserController {
-    @Autowired
-    private IUserService userService;
-    @GetMapping("/all")
-    public ResponseEntity<ResponseObject> user() {
-        try{
-            UserDTO user=  userService.getUserById(52);
-            return ResponseEntity.ok()
-                    .body(new ResponseObject("ok","Success user!",user));
-        }catch (Exception e){
-            return ResponseEntity.badRequest()
-                    .body(new ResponseObject("ok","get failed",""));
-        }
+	@Autowired
+	private IUserService userService;
+
+	@GetMapping("/all")
+	public ResponseEntity<ResponseObject> user() {
+		try {
+			UserDTO user = userService.getUserById(52);
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Success user!", user));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", "get failed", ""));
+		}
 
 
-    }
+	}
 
 }

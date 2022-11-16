@@ -12,17 +12,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderDetailConverter {
-    @Autowired
-    private ModelMapper modelMapper;
+	@Autowired
+	private ModelMapper modelMapper;
 
-    public OrderDetail convertToEntity(OrderDetailDTO orderDetailDTO) {
+	public OrderDetail convertToEntity(OrderDetailDTO orderDetailDTO) {
 
-        return modelMapper.map(orderDetailDTO,OrderDetail.class);
-    }
-    public OrderDetailDTO convertToResponse(OrderDetail orderDetail) {
-        ImageDTO imageDTO = modelMapper.map(orderDetail.getProduct().getImages().get(0),ImageDTO.class);
-        OrderDetailDTO result =modelMapper.map(orderDetail,OrderDetailDTO.class);
-        result.getProduct().setImage(imageDTO);
-        return result;
-    }
+		return modelMapper.map(orderDetailDTO, OrderDetail.class);
+	}
+
+	public OrderDetailDTO convertToResponse(OrderDetail orderDetail) {
+		ImageDTO imageDTO = modelMapper.map(orderDetail.getProduct().getImages().get(0), ImageDTO.class);
+		OrderDetailDTO result = modelMapper.map(orderDetail, OrderDetailDTO.class);
+		result.getProduct().setImage(imageDTO);
+		return result;
+	}
 }

@@ -13,103 +13,105 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+
 @Component
 public class JwtUtils {
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${tuyen.app.jwtSecret}")
-    private String jwtSecret;
+	@Value("${tuyen.app.jwtSecret}")
+	private String jwtSecret;
 
-    @Value("${tuyen.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
+	@Value("${tuyen.app.jwtExpirationMs}")
+	private int jwtExpirationMs;
 
-    @Value("${tuyen.app.jwtCookieName}")
-    private String jwtCookie;
+	@Value("${tuyen.app.jwtCookieName}")
+	private String jwtCookie;
 
-    @Value("${tuyen.app.jwtRefreshCookieName}")
-    private String jwtRefreshCookie;
+	@Value("${tuyen.app.jwtRefreshCookieName}")
+	private String jwtRefreshCookie;
 
-//    public ResponseCookie generateJwtToken(UserDetail userPrincipal) {
+	//    public ResponseCookie generateJwtToken(UserDetail userPrincipal) {
 //        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
 //        return generateCookie(jwtCookie, jwt, "/api",24*60*60);
 //    }
-    public String generateJwtToken(UserDetail userPrincipal) {
-        return generateTokenFromUsername(userPrincipal.getUsername());
-    }
-    public ResponseCookie generateJwtCookie(User user) {
-        String jwt = generateTokenFromUsername(user.getUserName());
-        return generateCookie(jwtCookie, jwt, "/api",24*60*60);
-    }
+	public String generateJwtToken(UserDetail userPrincipal) {
+		return generateTokenFromUsername(userPrincipal.getUsername());
+	}
 
-    public ResponseCookie generateRefreshJwtCookie(String refreshToken) {
-        return generateCookie(jwtRefreshCookie, refreshToken, "/api/auth/refreshtoken",24*60*60*2);
-    }
+	public ResponseCookie generateJwtCookie(User user) {
+		String jwt = generateTokenFromUsername(user.getUserName());
+		return generateCookie(jwtCookie, jwt, "/api", 24 * 60 * 60);
+	}
 
-    public String getJwtFromCookies(HttpServletRequest request) {
-        return getCookieValueByName(request, jwtCookie);
-    }
+	public ResponseCookie generateRefreshJwtCookie(String refreshToken) {
+		return generateCookie(jwtRefreshCookie, refreshToken, "/api/auth/refreshtoken", 24 * 60 * 60 * 2);
+	}
 
-    public String getJwtRefreshFromCookies(HttpServletRequest request) {
-        return getCookieValueByName(request, jwtRefreshCookie);
-    }
+	public String getJwtFromCookies(HttpServletRequest request) {
+		return getCookieValueByName(request, jwtCookie);
+	}
 
-    public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
-        return cookie;
-    }
+	public String getJwtRefreshFromCookies(HttpServletRequest request) {
+		return getCookieValueByName(request, jwtRefreshCookie);
+	}
 
-    public ResponseCookie getCleanJwtRefreshCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtRefreshCookie, null).path("/api/auth/refreshtoken").build();
-        return cookie;
-    }
+	public ResponseCookie getCleanJwtCookie() {
+		ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
+		return cookie;
+	}
 
-    public String getUserNameFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-    }
+	public ResponseCookie getCleanJwtRefreshCookie() {
+		ResponseCookie cookie = ResponseCookie.from(jwtRefreshCookie, null).path("/api/auth/refreshtoken").build();
+		return cookie;
+	}
 
-    public boolean validateJwtToken(String authToken) {
-        try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-            return true;
-        } catch (SignatureException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
-        }
+	public String getUserNameFromJwtToken(String token) {
+		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+	}
 
-        return false;
-    }
+	public boolean validateJwtToken(String authToken) {
+		try {
+			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+			return true;
+		} catch (SignatureException e) {
+			logger.error("Invalid JWT signature: {}", e.getMessage());
+		} catch (MalformedJwtException e) {
+			logger.error("Invalid JWT token: {}", e.getMessage());
+		} catch (ExpiredJwtException e) {
+			logger.error("JWT token is expired: {}", e.getMessage());
+		} catch (UnsupportedJwtException e) {
+			logger.error("JWT token is unsupported: {}", e.getMessage());
+		} catch (IllegalArgumentException e) {
+			logger.error("JWT claims string is empty: {}", e.getMessage());
+		}
 
-    public String generateTokenFromUsername(String username) {
-        System.out.println("expire time access token:"+new Date((new Date()).getTime() + jwtExpirationMs));
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
-    }
+		return false;
+	}
 
-    private ResponseCookie generateCookie(String name, String value, String path,long expireTime) {
-        ResponseCookie cookie = ResponseCookie.from(name, value).path(path)
+	public String generateTokenFromUsername(String username) {
+		System.out.println("expire time access token:" + new Date((new Date()).getTime() + jwtExpirationMs));
+		return Jwts.builder()
+				.setSubject(username)
+				.setIssuedAt(new Date())
+				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+				.signWith(SignatureAlgorithm.HS512, jwtSecret)
+				.compact();
+	}
+
+	private ResponseCookie generateCookie(String name, String value, String path, long expireTime) {
+		ResponseCookie cookie = ResponseCookie.from(name, value).path(path)
 //                .maxAge(expireTime)
-                .httpOnly(true).build();
-        return cookie;
-    }
+				.httpOnly(true).build();
+		return cookie;
+	}
 
-    private String getCookieValueByName(HttpServletRequest request, String name) {
-        Cookie cookie = WebUtils.getCookie(request, name);
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
-    }
+	private String getCookieValueByName(HttpServletRequest request, String name) {
+		Cookie cookie = WebUtils.getCookie(request, name);
+		if (cookie != null) {
+			return cookie.getValue();
+		} else {
+			return null;
+		}
+	}
 
 }

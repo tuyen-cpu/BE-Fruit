@@ -13,19 +13,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderConverter {
-    @Autowired
-    private ModelMapper modelMapper;
+	@Autowired
+	private ModelMapper modelMapper;
 
-    public OrderResponse convertToResponse(Bill entity) {
+	public OrderResponse convertToResponse(Bill entity) {
 
 
+		return modelMapper.map(entity, OrderResponse.class);
+	}
 
-        return modelMapper.map(entity,OrderResponse.class);
-    }
-    public Page<OrderResponse> convertToResponse(Page<Bill> pageEntity){
-        if (pageEntity == null) {
-            return null;
-        }
-        return pageEntity.map(this::convertToResponse);
-    }
+	public Page<OrderResponse> convertToResponse(Page<Bill> pageEntity) {
+		if (pageEntity == null) {
+			return null;
+		}
+		return pageEntity.map(this::convertToResponse);
+	}
 }

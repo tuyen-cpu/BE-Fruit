@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CategoryRepo extends JpaRepository<Category,Long> {
+public interface CategoryRepo extends JpaRepository<Category, Long> {
 
-    List<Category> findAllByStatus(Integer status);
+	List<Category> findAllByStatus(Integer status);
 }

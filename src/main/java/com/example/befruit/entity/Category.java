@@ -17,11 +17,11 @@ import java.util.List;
 @Entity
 @Table(name = "category")
 public class Category implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private Integer status;
-    @OneToMany(mappedBy = "category", targetEntity = Product.class, cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String name;
+	private Integer status;
+	@OneToMany(mappedBy = "category", targetEntity = Product.class, cascade = CascadeType.ALL)
+	private List<Product> products = new ArrayList<>();
 }

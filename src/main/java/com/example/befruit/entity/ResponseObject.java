@@ -10,7 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseObject implements Serializable {
-    private String status;
-    private String message;
-    private Object data;
+	private String status;
+	private String message;
+	private Object data;
 }

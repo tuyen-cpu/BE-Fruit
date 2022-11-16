@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/image")
 public class ImageController {
-    @Autowired
-    private ImageService imageService;
-    @GetMapping("")
-    public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "productId",required = false) long productId
-                                                                     ){
-        try{
-            ImageDTO image = imageService.getByProductId(productId);
-            return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",image));
+  @Autowired
+  private ImageService imageService;
+  @GetMapping("")
+  public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "productId",required = false) long productId
+  ){
+    try{
+      ImageDTO image = imageService.getByProductId(productId);
+      return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",image));
 
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
 
-        }
     }
+  }
 }

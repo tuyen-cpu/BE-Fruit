@@ -10,11 +10,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO implements Serializable {
-    private Long id;
-    private String email;
-    private String userName;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private Integer status;
+	private Long id;
+	private String email;
+	private String userName;
+	private String password;
+	private String firstName;
+	private String lastName;
+	private Integer status;
 }

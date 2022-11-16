@@ -13,8 +13,8 @@ import java.io.Serializable;
 @Entity
 @Table(name = "shipping_status")
 public class ShippingStatus implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String name;
 }

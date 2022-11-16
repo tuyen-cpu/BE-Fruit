@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ShippingStatusService implements IShippingStatusService {
-    @Autowired
-    private ShippingStatusRepo shippingStatusRepo;
-    @Override
-    public ShippingStatus getByName(String name) {
-        return shippingStatusRepo.findByName(name);
-    }
+	@Autowired
+	private ShippingStatusRepo shippingStatusRepo;
+
+	@Override
+	public ShippingStatus getByName(String name) {
+		return shippingStatusRepo.findByName(name);
+	}
 }

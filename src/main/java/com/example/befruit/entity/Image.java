@@ -13,11 +13,11 @@ import java.io.Serializable;
 @Entity
 @Table(name = "image")
 public class Image implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String link;
-    @ManyToOne(targetEntity = Product.class)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String link;
+	@ManyToOne(targetEntity = Product.class)
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product product;
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageDTO implements Serializable {
-    private Integer id;
-    private String link;
+	private Integer id;
+	private String link;
 
 }

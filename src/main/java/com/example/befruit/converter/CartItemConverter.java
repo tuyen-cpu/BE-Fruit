@@ -16,31 +16,35 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CartItemConverter {
-    @Autowired
-    private ModelMapper modelMapper;
-    public CartItemResponse convertToResponse(CartItem entity){
-        CartItemResponse cartItemResponse = modelMapper.map(entity, CartItemResponse.class);
-        ProductResponse productResponse= modelMapper.map(entity.getProduct(),ProductResponse.class);
-        ImageDTO imageDTO = modelMapper.map(entity.getProduct().getImages().get(0),ImageDTO.class);
-        productResponse.setImage(imageDTO);
-        cartItemResponse.setProduct(productResponse);
-        return cartItemResponse;
+	@Autowired
+	private ModelMapper modelMapper;
 
-    }
-    public CartItemResponse convertToResponse(CartItemRequest entity){
-        return modelMapper.map(entity, CartItemResponse.class);
-    }
+	public CartItemResponse convertToResponse(CartItem entity) {
+		CartItemResponse cartItemResponse = modelMapper.map(entity, CartItemResponse.class);
+		ProductResponse productResponse = modelMapper.map(entity.getProduct(), ProductResponse.class);
+		ImageDTO imageDTO = modelMapper.map(entity.getProduct().getImages().get(0), ImageDTO.class);
+		productResponse.setImage(imageDTO);
+		cartItemResponse.setProduct(productResponse);
+		return cartItemResponse;
 
-    public CartItem convertToEntity(CartItemRequest dto){
-        return modelMapper.map(dto, CartItem.class);
-    }
-    public CartItem convertToEntity(CartItemResponse dto){
-        return modelMapper.map(dto, CartItem.class);
-    }
-    public Page<CartItemResponse> convertToResponse(Page<CartItem> pageEntity){
-        if (pageEntity == null) {
-            return null;
-        }
-        return pageEntity.map(this::convertToResponse);
-    }
+	}
+
+	public CartItemResponse convertToResponse(CartItemRequest entity) {
+		return modelMapper.map(entity, CartItemResponse.class);
+	}
+
+	public CartItem convertToEntity(CartItemRequest dto) {
+		return modelMapper.map(dto, CartItem.class);
+	}
+
+	public CartItem convertToEntity(CartItemResponse dto) {
+		return modelMapper.map(dto, CartItem.class);
+	}
+
+	public Page<CartItemResponse> convertToResponse(Page<CartItem> pageEntity) {
+		if (pageEntity == null) {
+			return null;
+		}
+		return pageEntity.map(this::convertToResponse);
+	}
 }

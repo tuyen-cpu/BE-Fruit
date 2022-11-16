@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderDetailRepo extends JpaRepository<OrderDetail,Long> {
-    @Query("select o from OrderDetail o where o.bill.id=:billId")
-List<OrderDetail> findAllByBillId(@Param("billId") Long id);
+public interface OrderDetailRepo extends JpaRepository<OrderDetail, Long> {
+	@Query("select o from OrderDetail o where o.bill.id=:billId")
+	List<OrderDetail> findAllByBillId(@Param("billId") Long id);
 }

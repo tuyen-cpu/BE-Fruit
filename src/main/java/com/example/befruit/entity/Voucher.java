@@ -14,15 +14,15 @@ import java.util.Date;
 @Entity
 @Table(name = "voucher")
 public class Voucher implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String code;
-    private Long cost;
-    private Date startDate;
-    private Date endDate;
-    private Integer times;
-    private Integer status;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String code;
+	private Long cost;
+	private Date startDate;
+	private Date endDate;
+	private Integer times;
+	private Integer status;
 
 
 }

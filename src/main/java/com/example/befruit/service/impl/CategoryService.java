@@ -9,20 +9,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class CategoryService implements ICategory {
-    @Autowired
-    private CategoryRepo categoryRepo;
-    @Autowired
-    private CategoryConverter categoryConverter;
-    @Override
-    public List<CategoryDTO> getAll() {
-        return categoryRepo.findAll().stream().map(entity->categoryConverter.convertToDto(entity)).collect(Collectors.toList());
-    }
+	@Autowired
+	private CategoryRepo categoryRepo;
+	@Autowired
+	private CategoryConverter categoryConverter;
 
-    @Override
-    public List<CategoryDTO> getAll(Integer status) {
-        return categoryRepo.findAllByStatus(status).stream().map(entity->categoryConverter.convertToDto(entity)).collect(Collectors.toList());
-    }
+	@Override
+	public List<CategoryDTO> getAll() {
+		return categoryRepo.findAll().stream().map(entity -> categoryConverter.convertToDto(entity)).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<CategoryDTO> getAll(Integer status) {
+		return categoryRepo.findAllByStatus(status).stream().map(entity -> categoryConverter.convertToDto(entity)).collect(Collectors.toList());
+	}
 
 }

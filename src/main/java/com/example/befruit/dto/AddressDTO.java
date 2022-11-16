@@ -15,6 +15,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class AddressDTO implements Serializable {
 	private Long id;
+	private String firstName;
+	private String lastName;
+	private String phone;
+	private Integer isDefault;
 	private String city;
 	private String district;
 	private String ward;

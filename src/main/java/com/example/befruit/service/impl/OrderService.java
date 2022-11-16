@@ -47,7 +47,11 @@ public class OrderService implements IOrderService {
 			AddressDTO addressResponse = orderRequest.getAddress();
 			Address address = null;
 			if (addressResponse.getId() == null) {
+				if(addressResponse.getIsDefault()==null){
+					addressResponse.setIsDefault(0);
+				}
 				address = addressRepo.save(addressConverter.convertToEntity(addressResponse));
+
 			} else {
 				address = addressConverter.convertToEntity(addressResponse);
 			}

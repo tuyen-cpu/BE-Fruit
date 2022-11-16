@@ -17,8 +17,6 @@ public class OrderConverter {
 	private ModelMapper modelMapper;
 
 	public OrderResponse convertToResponse(Bill entity) {
-
-
 		return modelMapper.map(entity, OrderResponse.class);
 	}
 

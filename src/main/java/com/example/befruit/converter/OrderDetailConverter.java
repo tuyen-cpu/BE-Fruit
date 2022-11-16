@@ -2,6 +2,7 @@ package com.example.befruit.converter;
 
 import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.OrderDetailDTO;
+import com.example.befruit.dto.request.OrderDetailRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Image;
 import com.example.befruit.entity.OrderDetail;
@@ -15,7 +16,7 @@ public class OrderDetailConverter {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	public OrderDetail convertToEntity(OrderDetailDTO orderDetailDTO) {
+	public OrderDetail convertToEntity(OrderDetailRequest orderDetailDTO) {
 
 		return modelMapper.map(orderDetailDTO, OrderDetail.class);
 	}

@@ -18,10 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "bill")
-public class Bill implements Serializable {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class Bill extends Base<String> implements Serializable {
+
 	private Long shippingCost;
 	private Long total;
 	private String description;

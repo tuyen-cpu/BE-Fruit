@@ -12,15 +12,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Entity
 @Table(name = "address")
-public class Address implements Serializable {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class Address extends Base<String> implements Serializable {
+
 	private String city;
 	private String district;
 	private String ward;
 	private String street;
 	private String description;
+	private boolean isDefault;
 	private Integer status;
 	@ManyToOne(targetEntity = User.class)
 	@JoinColumn(name = "user_id", nullable = false)

@@ -51,7 +51,9 @@ public class OrderService implements IOrderService {
 			} else {
 				address = addressConverter.convertToEntity(addressResponse);
 			}
-			System.out.println(address.toString());
+			System.out.println(address.getDistrict());
+			System.out.println(address.getCity());
+			System.out.println(address.getWard());
 
 			ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
@@ -88,6 +90,7 @@ public class OrderService implements IOrderService {
 		try {
 			Pageable pageable = PageRequest.of(page, size);
 			Page<Bill> orderResponses = orderRepo.findAllByUserIdAndStatus(userId, EStatus.ACTIVE.getName(), pageable);
+
 			return orderConverter.convertToResponse(orderResponses);
 
 

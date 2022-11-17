@@ -1,6 +1,7 @@
 package com.example.befruit.service;
 
 import com.example.befruit.dto.AddressDTO;
+import com.example.befruit.entity.Address;
 import org.springframework.data.domain.Page;
 
 public interface IAddressService {
@@ -8,4 +9,5 @@ public interface IAddressService {
 
 	AddressDTO get(Long id);
 	AddressDTO add(AddressDTO addressDTO);
+	AddressDTO update(AddressDTO addressDTO);
 }

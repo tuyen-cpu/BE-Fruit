@@ -23,6 +23,7 @@ public class Bill extends Base<String> implements Serializable {
 	private Long shippingCost;
 	private Long total;
 	private String description;
+	private String address;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable = false)
 	private Date createdDate;
@@ -32,9 +33,9 @@ public class Bill extends Base<String> implements Serializable {
 	@JoinColumn(name = "shipping_status_id", nullable = false)
 	private ShippingStatus shippingStatus;
 
-	@ManyToOne(targetEntity = Address.class)
-	@JoinColumn(name = "address_id", nullable = false)
-	private Address address;
+	@ManyToOne(targetEntity = User.class)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 
 	@OneToMany(mappedBy = "bill",

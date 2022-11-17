@@ -48,4 +48,18 @@ public class AddressController {
 
 
 	}
+	@PutMapping("/update")
+	public ResponseEntity<ResponseObject> update(@RequestBody AddressDTO addressDTO) {
+		try {
+			addressDTO.setStatus(1);
+			AddressDTO address = addressService.update(addressDTO);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "update address successful!", address));
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+
+
+	}
 }

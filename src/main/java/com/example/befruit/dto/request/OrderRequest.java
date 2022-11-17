@@ -18,7 +18,8 @@ public class OrderRequest implements Serializable {
 	private Long id;
 	private Long shippingCost;
 	private String description;
-	private AddressDTO address;
+	private String address;
+	private Long userId;
 	private List<OrderDetailRequest> orderDetails = new ArrayList<>();
 
 }

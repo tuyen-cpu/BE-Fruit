@@ -10,6 +10,7 @@ import com.example.befruit.entity.*;
 import com.example.befruit.repo.AddressRepo;
 import com.example.befruit.repo.OrderDetailRepo;
 import com.example.befruit.repo.OrderRepo;
+import com.example.befruit.repo.UserRepo;
 import com.example.befruit.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,8 @@ public class OrderService implements IOrderService {
 	@Autowired
 	private OrderRepo orderRepo;
 	@Autowired
+	private UserRepo userRepo;
+	@Autowired
 	private OrderDetailConverter orderDetailConverter;
 	@Autowired
 	private OrderConverter orderConverter;
@@ -44,28 +47,30 @@ public class OrderService implements IOrderService {
 	public Boolean addOrder(OrderRequest orderRequest) {
 
 		try {
-			AddressDTO addressResponse = orderRequest.getAddress();
-			Address address = null;
-			if (addressResponse.getId() == null) {
-				if(addressResponse.getIsDefault()==null){
-					addressResponse.setIsDefault(0);
-				}
-				address = addressRepo.save(addressConverter.convertToEntity(addressResponse));
+//			AddressDTO addressResponse = orderRequest.getAddress();
+//			Address address = null;
+//			if (addressResponse.getId() == null) {
+//				if(addressResponse.getIsDefault()==null){
+//					addressResponse.setIsDefault(0);
+//				}
+//				address = addressRepo.save(addressConverter.convertToEntity(addressResponse));
 
-			} else {
-				address = addressConverter.convertToEntity(addressResponse);
-			}
-			System.out.println(address.getDistrict());
-			System.out.println(address.getCity());
-			System.out.println(address.getWard());
+//			} else {
+//				address = addressConverter.convertToEntity(addressResponse);
+//			}
+//			System.out.println(address.getDistrict());
+//			System.out.println(address.getCity());
+//			System.out.println(address.getWard());
 
 			ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
-
+			User user = userRepo.findById(orderRequest.getUserId()).get();
 			Bill order = new Bill();
 			order.setStatus(EStatus.ACTIVE.getName());
 			order.setShippingStatus(shippingStatus);
-			order.setAddress(address);
+			order.setUser(user);
+			order.setAddress(orderRequest.getAddress());
+
 			order.setDescription(orderRequest.getDescription());
 			long total = 0L;
 

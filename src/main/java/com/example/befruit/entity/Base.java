@@ -46,19 +46,22 @@ public abstract class Base<U>  implements Serializable {
 //		createdAt = new Date();
 //		updatedAt= new Date();
 //	}
-	@CreatedBy
-	@Column(name = "created_by", nullable = false)
-	protected U createdBy;
+
+
 	@LastModifiedBy
 	@Column(name = "update_by", nullable = false)
 	protected U updatedBy;
+
+	@CreatedBy
+	@Column(name = "created_by", nullable = false)
+	protected U createdBy;
 
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false)
 	protected Date createdAt;
 
 	@UpdateTimestamp
-	@Column(name = "update_at")
+	@Column(name = "update_at", nullable = false)
 	protected Date updatedAt;
 
 }

@@ -16,5 +16,5 @@ public class OrderResponse {
 	private Long total;
 	private Date createdDate;
 	private ShippingStatus shippingStatus;
-	private Address address;
+	private String address;
 }

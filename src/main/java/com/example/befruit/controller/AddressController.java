@@ -28,5 +28,24 @@ public class AddressController {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 
 		}
+
+
+	}
+	@PostMapping("/add")
+	public ResponseEntity<ResponseObject> add(@RequestBody AddressDTO addressDTO) {
+		try {
+			addressDTO.setStatus(1);
+			if(addressDTO.getIsDefault()==null||addressDTO.getIsDefault().equals("")){
+				addressDTO.setIsDefault(0);
+			}
+			AddressDTO address = addressService.add(addressDTO);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "add address successful!", address));
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+
+
 	}
 }

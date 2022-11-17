@@ -28,4 +28,10 @@ public class AddressService implements IAddressService {
 	public AddressDTO get(Long id) {
 		return addressConverter.convertToDTO(addressRepo.findById(id).get());
 	}
+
+	@Override
+	public AddressDTO add(AddressDTO addressDTO) {
+		return addressConverter.convertToDTO(addressRepo.save(addressConverter.convertToEntity(addressDTO)));
+	}
+
 }

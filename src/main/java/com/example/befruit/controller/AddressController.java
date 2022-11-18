@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/address")
 public class AddressController {
@@ -31,11 +33,12 @@ public class AddressController {
 
 
 	}
+
 	@PostMapping("/add")
 	public ResponseEntity<ResponseObject> add(@RequestBody AddressDTO addressDTO) {
 		try {
 			addressDTO.setStatus(1);
-			if(addressDTO.getIsDefault()==null||addressDTO.getIsDefault().equals("")){
+			if (addressDTO.getIsDefault() == null || addressDTO.getIsDefault().equals("")) {
 				addressDTO.setIsDefault(0);
 			}
 			AddressDTO address = addressService.add(addressDTO);
@@ -48,12 +51,23 @@ public class AddressController {
 
 
 	}
+
 	@PutMapping("/update")
 	public ResponseEntity<ResponseObject> update(@RequestBody AddressDTO addressDTO) {
 		try {
 			addressDTO.setStatus(1);
 			AddressDTO address = addressService.update(addressDTO);
 			return ResponseEntity.ok().body(new ResponseObject("ok", "update address successful!", address));
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<ResponseObject> delete(@PathVariable("id") Long id) {
+		try {
+			addressService.delete(id);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Deleted address!", ""));
 
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));

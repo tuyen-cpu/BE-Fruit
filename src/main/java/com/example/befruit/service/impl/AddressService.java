@@ -13,6 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AddressService implements IAddressService {
@@ -22,6 +26,7 @@ public class AddressService implements IAddressService {
 	private AddressRepo addressRepo;
 	@Autowired
 	private UserRepo userRepo;
+
 	@Override
 	public Page<AddressDTO> getAllByUserId(Long userId, Integer status, Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
@@ -33,14 +38,24 @@ public class AddressService implements IAddressService {
 		return addressConverter.convertToDTO(addressRepo.findById(id).get());
 	}
 
+	@Transactional
 	@Override
 	public AddressDTO add(AddressDTO addressDTO) {
+		if(addressDTO.getIsDefault()==1){
+		this.setDefaultOnlyOne();
+		}
 		return addressConverter.convertToDTO(addressRepo.save(addressConverter.convertToEntity(addressDTO)));
 	}
-
+ private void setDefaultOnlyOne(){
+	 List<Address> addresses = addressRepo.findAllByIsDefault(1);
+	 List<Address> addressesChanged = addresses.stream().peek(e -> e.setIsDefault(0)).collect(Collectors.toList());
+	 addressRepo.saveAll(addressesChanged);
+ }
+ @Transactional
 	@Override
 	public AddressDTO update(AddressDTO addressDTO) {
-		Address  address = addressRepo.findById(addressDTO.getId()).get();
+		this. setDefaultOnlyOne();
+		Address address = addressRepo.findById(addressDTO.getId()).get();
 		address.setIsDefault(addressDTO.getIsDefault());
 		address.setStatus(addressDTO.getStatus());
 		address.setCity(addressDTO.getCity());
@@ -54,6 +69,11 @@ public class AddressService implements IAddressService {
 		address.setStreet(addressDTO.getStreet());
 		address.setPhone(addressDTO.getPhone());
 		return addressConverter.convertToDTO(addressRepo.save(address));
+	}
+
+	@Override
+	public void delete(Long id) {
+		addressRepo.deleteById(id);
 	}
 
 }

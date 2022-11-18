@@ -115,4 +115,12 @@ public class OrderService implements IOrderService {
 		return orderConverter.convertToResponse(orderRepo.findById(id).get());
 	}
 
+	@Override
+	public OrderResponse updateStatusShipping(Long id, String status) {
+		ShippingStatus shippingStatus = shippingStatusService.getByName(status);
+		Bill order = orderRepo.findById(id).get();
+		order.setShippingStatus(shippingStatus);
+		return orderConverter.convertToResponse(orderRepo.save(order));
+	}
+
 }

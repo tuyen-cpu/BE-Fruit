@@ -3,6 +3,7 @@ import com.example.befruit.dto.OrderDetailDTO;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.dto.response.ProductResponse;
+import com.example.befruit.entity.EShippingStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.IOrderDetailService;
 import com.example.befruit.service.IOrderService;
@@ -52,6 +53,17 @@ public class OrderController {
   public ResponseEntity<ResponseObject> getById(@PathVariable(name ="id" ,required = false) long id){
     try{
       OrderResponse orderResponses = orderService.getById(id);
+      return ResponseEntity.ok().body(new ResponseObject("ok","Get order successful!",orderResponses));
+
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+    }
+  }
+  @PutMapping("/update-shipping-status")
+  public ResponseEntity<ResponseObject> updateStatusShipping(@RequestBody OrderRequest orderRequest){
+    try{
+      OrderResponse orderResponses = orderService.updateStatusShipping(orderRequest.getId(), EShippingStatus.CANCELED.getName());
       return ResponseEntity.ok().body(new ResponseObject("ok","Get order successful!",orderResponses));
 
     }catch (Exception e){

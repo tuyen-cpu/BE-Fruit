@@ -23,8 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,8 +75,13 @@ public class AuthController {
 					.body(new ResponseObject("ok", "Login successful!",
 							new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(), roles)));
 
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed", "login failed!", "Tài khoản hoặc mật khẩu khôn hợp lệ!"));
+		}  catch (BadCredentialsException e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", "Email or password invalid!", ""));
+		} catch (LockedException e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+		} catch (DisabledException e) {
+				return ResponseEntity.badRequest().body(new ResponseObject("failed","Account is not verified!", ""));
+
 		}
 
 	}

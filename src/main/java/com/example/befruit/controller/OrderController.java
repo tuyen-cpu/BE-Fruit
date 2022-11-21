@@ -23,7 +23,7 @@ public class OrderController {
   @Autowired
   private IOrderDetailService orderDetailService;
   @PostMapping("")
-  public ResponseEntity<ResponseObject> google(@RequestBody OrderRequest orderRequest) {
+  public ResponseEntity<ResponseObject> add(@RequestBody OrderRequest orderRequest) {
 
     try {
       Boolean result = orderService.addOrder(orderRequest);

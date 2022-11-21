@@ -16,7 +16,11 @@ public class UserDetailService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String email) {
 		User user = userRepo.findByEmailAndStatus(email, 1);
-		if (user == null) {
+		if (user == null
+
+//				||!user.getEnabled()
+
+		) {
 			throw new UsernameNotFoundException("Email " + email + " chưa được đăng ký!");
 		}
 		return UserDetail.build(user);

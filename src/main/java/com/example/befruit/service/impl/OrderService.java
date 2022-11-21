@@ -65,13 +65,16 @@ public class OrderService implements IOrderService {
 			ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
 			User user = userRepo.findById(orderRequest.getUserId()).get();
+			Payment p = orderRequest.getPayment();
+			System.out.println("payment: "+p.getEmail());
 			Bill order = new Bill();
+
 			order.setStatus(EStatus.ACTIVE.getName());
 			order.setShippingStatus(shippingStatus);
 			order.setUser(user);
 			order.setAddress(orderRequest.getAddress());
-
 			order.setDescription(orderRequest.getDescription());
+
 			long total = 0L;
 
 			List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream().map(dto -> orderDetailConverter.convertToEntity(dto)).collect(Collectors.toList());
@@ -85,6 +88,10 @@ public class OrderService implements IOrderService {
 			}
 			order.setTotal(total);
 			order.setOrderDetails(orderDetails);
+			p.setBill(order);
+			System.out.println("bill in payment "+p.getBill().getAddress()+"");
+			order.setPayment(p);
+			System.out.println(p.getId()+"tuyennn121212");
 			orderRepo.save(order);
 
 			return true;

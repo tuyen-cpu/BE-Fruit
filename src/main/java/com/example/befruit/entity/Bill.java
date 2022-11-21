@@ -49,6 +49,10 @@ public class Bill extends Base<String> implements Serializable {
 	@JoinColumn(name = "voucher_id")
 	private Voucher voucher;
 
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "payment_id", referencedColumnName = "id")
+	private Payment payment;
+
 	@PrePersist
 	private void onCreate() {
 		createdDate = new Date();

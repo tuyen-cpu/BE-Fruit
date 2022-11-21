@@ -15,15 +15,17 @@ public class UserDetail implements UserDetails {
 	private String email;
 	//    @JsonIgnore
 	private String password;
+	private Boolean isEnabled;
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public UserDetail(Long id, String username, String email, String password,
+	public UserDetail(Long id, String username, String email, String password,Boolean isEnabled,
 										Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.authorities = authorities;
+		this.isEnabled =isEnabled;
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public class UserDetail implements UserDetails {
 	public static UserDetail build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-		return new UserDetail(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(), authorities);
+		return new UserDetail(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(),user.getEnabled(), authorities);
 	}
 
 	@Override
@@ -72,7 +74,7 @@ public class UserDetail implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return isEnabled;
 	}
 
 

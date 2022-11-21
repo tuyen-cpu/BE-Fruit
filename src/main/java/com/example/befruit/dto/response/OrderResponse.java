@@ -2,6 +2,7 @@ package com.example.befruit.dto.response;
 
 
 import com.example.befruit.entity.Address;
+import com.example.befruit.entity.Payment;
 import com.example.befruit.entity.ShippingStatus;
 import lombok.*;
 
@@ -17,4 +18,5 @@ public class OrderResponse {
 	private Date createdDate;
 	private ShippingStatus shippingStatus;
 	private String address;
+	private Payment payment;
 }

@@ -3,6 +3,7 @@ package com.example.befruit.dto.request;
 import com.example.befruit.dto.AddressDTO;
 import com.example.befruit.dto.OrderDetailDTO;
 import com.example.befruit.entity.OrderDetail;
+import com.example.befruit.entity.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,5 @@ public class OrderRequest implements Serializable {
 	private String address;
 	private Long userId;
 	private List<OrderDetailRequest> orderDetails = new ArrayList<>();
-
+	private Payment payment;
 }

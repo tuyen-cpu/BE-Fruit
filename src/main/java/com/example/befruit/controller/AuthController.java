@@ -73,14 +73,14 @@ public class AuthController {
 
 			return ResponseEntity.ok()
 					.body(new ResponseObject("ok", "Login successful!",
-							new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(), roles)));
+							new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(),userDetail.getFirstName(),userDetail.getLastName(), roles)));
 
 		}  catch (BadCredentialsException e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", "Email or password invalid!", ""));
 		} catch (LockedException e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 		} catch (DisabledException e) {
-				return ResponseEntity.badRequest().body(new ResponseObject("failed","Account is not verified!", ""));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed","Account is not verified!", ""));
 
 		}
 
@@ -124,7 +124,7 @@ public class AuthController {
 						.collect(Collectors.toList());
 			}
 
-			return ResponseEntity.ok().body(new ResponseObject("ok", "Login with google success!", new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(), roles)));
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Login with google success!", new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(),userDetail.getFirstName(),userDetail.getLastName(), roles)));
 
 
 		} catch (Exception e) {
@@ -169,7 +169,7 @@ public class AuthController {
 			throws UnsupportedEncodingException, MessagingException {
 		try {
 			userService.register(user, urlFrontend, true);
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "Register successful!", user));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "Register successful. Please check your mail to verify!", user));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", "Register failed!", e.getMessage()));
 		}

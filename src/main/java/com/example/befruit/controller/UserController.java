@@ -6,10 +6,7 @@ import com.example.befruit.entity.User;
 import com.example.befruit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,6 +24,20 @@ public class UserController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("ok", "get failed", ""));
+		}
+
+
+	}
+	@PutMapping("/update")
+	public ResponseEntity<ResponseObject> update(@RequestBody UserDTO userDTO) {
+		System.out.println(userDTO.getFirstName());
+		try {
+			UserDTO user = userService.update(userDTO);
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Update successful!", user));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
 		}
 
 

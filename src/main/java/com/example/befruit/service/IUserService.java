@@ -27,5 +27,6 @@ public interface IUserService {
 	boolean checkExistByEmail(String email);
 
 	User getUserByEmail(String email);
+	UserDTO update(UserDTO userDTO);
 
 }

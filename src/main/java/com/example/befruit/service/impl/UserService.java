@@ -90,9 +90,7 @@ public class UserService implements IUserService {
         }*/
 
 		userDTO.setPassword(encodedPassword(userDTO.getPassword()));
-
 		User user = userConverter.convertToEntity(userDTO);
-
 		Role role = roleRepo.findByName(ERole.CLIENT.name());
 		user.addRole(role);
 		user.setStatus(1);
@@ -120,7 +118,7 @@ public class UserService implements IUserService {
 	public void forgotPassword(String email, String siteURL) {
 		User user = userRepo.findByEmailAndStatus(email, 1);
 		if (user == null) {
-			throw new RuntimeException("Email không tồn tại!");
+			throw new RuntimeException("Email does not exists!");
 		}
 		String randomCode = RandomString.make(64);
 		user.setVerificationCode(randomCode);
@@ -153,6 +151,7 @@ public class UserService implements IUserService {
 			return false;
 		}
 		user.setEnabled(true);
+		user.setVerificationCode(null);
 		userRepo.save(user);
 		return true;
 
@@ -177,6 +176,15 @@ public class UserService implements IUserService {
 	@Override
 	public User getUserByEmail(String email) {
 		return userRepo.findByEmail(email);
+	}
+
+	@Override
+	public UserDTO update(UserDTO userDTO) {
+		User user = userRepo.findById(userDTO.getId()).get();
+		user.setFirstName(userDTO.getFirstName());
+		user.setLastName(userDTO.getLastName());
+		User userSaved = userRepo.save(user);
+		return userConverter.convertToDto(userSaved);
 	}
 
 	private void sendMailForgotPassword(User user, String siteURL) {

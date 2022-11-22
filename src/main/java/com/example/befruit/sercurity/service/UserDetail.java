@@ -16,9 +16,11 @@ public class UserDetail implements UserDetails {
 	//    @JsonIgnore
 	private String password;
 	private Boolean isEnabled;
+	private String firstName;
+	private String lastName;
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public UserDetail(Long id, String username, String email, String password,Boolean isEnabled,
+	public UserDetail(Long id, String username, String email, String password,Boolean isEnabled, String firstName,String lastName,
 										Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
@@ -26,6 +28,8 @@ public class UserDetail implements UserDetails {
 		this.password = password;
 		this.authorities = authorities;
 		this.isEnabled =isEnabled;
+		this.firstName=firstName;
+		this.lastName=lastName;
 	}
 
 	@Override
@@ -36,7 +40,7 @@ public class UserDetail implements UserDetails {
 	public static UserDetail build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-		return new UserDetail(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(),user.getEnabled(), authorities);
+		return new UserDetail(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(),user.getEnabled(),user.getFirstName(),user.getLastName(), authorities);
 	}
 
 	@Override
@@ -55,6 +59,13 @@ public class UserDetail implements UserDetails {
 
 	public String getEmail() {
 		return email;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
 	}
 
 	@Override

@@ -56,6 +56,7 @@ public class AddressService implements IAddressService {
 	public AddressDTO update(AddressDTO addressDTO) {
 		this. setDefaultOnlyOne();
 		Address address = addressRepo.findById(addressDTO.getId()).get();
+
 		address.setIsDefault(addressDTO.getIsDefault());
 		address.setStatus(addressDTO.getStatus());
 		address.setCity(addressDTO.getCity());

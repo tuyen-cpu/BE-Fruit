@@ -9,5 +9,6 @@ public interface IProductService {
 	Page<ProductResponse> getAll(Long price, Integer page, Integer size);
 
 	Page<ProductResponse> search(String key, Integer page, Integer size);
+	ProductResponse getById(Long id);
 
 }

@@ -6,10 +6,7 @@ import com.example.befruit.service.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/product")
@@ -47,6 +44,18 @@ public class ProductController {
 		try {
 			Page<ProductResponse> products = productService.search(key, page, size);
 			return ResponseEntity.ok().body(new ResponseObject("ok", "Search with key " + key + " product successful!", products));
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+	}
+	@GetMapping("/{id}")
+	public ResponseEntity<ResponseObject> getById(@PathVariable(name = "id")Long id ) {
+
+		try {
+			ProductResponse product = productService.getById(id);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product" + id + "successfully!", product));
 
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));

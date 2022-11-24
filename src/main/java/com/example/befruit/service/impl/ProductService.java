@@ -38,4 +38,14 @@ public class ProductService implements IProductService {
 		return productConverter.convertToResponse(productRepo.findAllByNameOrCategoryName(key, pageable));
 	}
 
+	@Override
+	public ProductResponse getById(Long id) {
+		try {
+			return productConverter.convertToResponse(productRepo.findById(id).get());
+		} catch (Exception e) {
+			throw new RuntimeException("Product " + id + " is not found!");
+		}
+
+	}
+
 }

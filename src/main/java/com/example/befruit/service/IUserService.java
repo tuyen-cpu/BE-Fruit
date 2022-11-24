@@ -23,6 +23,7 @@ public interface IUserService {
 	Boolean verify(String verificationCode);
 
 	void resetPassword(String verificationCode, String password);
+	void changePassword(String email, String password);
 
 	boolean checkExistByEmail(String email);
 

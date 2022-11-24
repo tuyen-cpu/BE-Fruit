@@ -166,7 +166,14 @@ public class UserService implements IUserService {
 		user.setVerificationCode(null);
 		userRepo.save(user);
 	}
-
+	@Transactional
+	@Override
+	public void changePassword(String email,String password) {
+		User user = userRepo.findByEmail(email);
+		if (user == null) throw new RuntimeException("Account does not exist!");
+		user.setPassword(encodedPassword(password));
+		userRepo.save(user);
+	}
 
 	@Override
 	public boolean checkExistByEmail(String email) {

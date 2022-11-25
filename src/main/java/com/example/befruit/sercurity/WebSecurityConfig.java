@@ -1,5 +1,6 @@
 package com.example.befruit.sercurity;
 
+import com.example.befruit.entity.ERole;
 import com.example.befruit.sercurity.jwt.AuthEntryPointJwt;
 import com.example.befruit.sercurity.jwt.AuthTokenFilter;
 import com.example.befruit.sercurity.service.UserDetailService;
@@ -70,7 +71,7 @@ public class WebSecurityConfig {
 		corsConfiguration.setExposedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization",
 				"Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
+		String[] admins = {ERole.ADMIN.name(),ERole.MANAGER.name()};
 		http.csrf().disable().cors().configurationSource(request -> corsConfiguration).and()
 				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -78,6 +79,7 @@ public class WebSecurityConfig {
 				.antMatchers("/api/auth/**").permitAll()
 				.antMatchers("/api/product/**").permitAll()
 				.antMatchers("/api/cart/add").permitAll()
+				.antMatchers("/api/admin/*").hasAnyRole(admins)
 				.antMatchers("/api/**").permitAll()
 				.anyRequest().authenticated()
 				.and();

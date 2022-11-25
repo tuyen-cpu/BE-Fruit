@@ -2,6 +2,7 @@ package com.example.befruit.service.impl;
 
 import com.example.befruit.converter.UserConverter;
 import com.example.befruit.dto.UserDTO;
+import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.ERole;
 import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
@@ -12,6 +13,10 @@ import com.example.befruit.service.IUserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -192,6 +197,12 @@ public class UserService implements IUserService {
 		user.setLastName(userDTO.getLastName());
 		User userSaved = userRepo.save(user);
 		return userConverter.convertToDto(userSaved);
+	}
+
+	@Override
+	public Page<UserResponse> getAll(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return userConverter.convertToResponse(userRepo.findAll(pageable));
 	}
 
 	private void sendMailForgotPassword(User user, String siteURL) {

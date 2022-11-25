@@ -2,11 +2,14 @@ package com.example.befruit.controller;
 
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.request.ChangePasswordRequest;
+import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.entity.User;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,16 +27,16 @@ public class UserController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 	@GetMapping("/all")
-	public ResponseEntity<ResponseObject> user() {
+	public ResponseEntity<ResponseObject> user( @RequestParam(name = "page", defaultValue = "0") int page,
+																							@RequestParam(name = "size", defaultValue = "10") int size) {
 		try {
-			UserDTO user = userService.getUserById(52);
+			Page<UserResponse> user = userService.getAll(page,size);
 			return ResponseEntity.ok()
-					.body(new ResponseObject("ok", "Success user!", user));
+					.body(new ResponseObject("ok", "Get user successfully!", user));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", "get failed", ""));
+					.body(new ResponseObject("ok", "Get failed!", ""));
 		}
-
 
 	}
 	@PutMapping("/update")

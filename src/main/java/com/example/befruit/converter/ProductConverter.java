@@ -19,8 +19,10 @@ public class ProductConverter {
 
 	public ProductResponse convertToResponse(Product product) {
 		ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
-		ImageDTO imageDTO = modelMapper.map(product.getImages().get(0), ImageDTO.class);
-		productResponse.setImage(imageDTO);
+		if(product.getImages().size()>0){
+			ImageDTO imageDTO = modelMapper.map(product.getImages().get(0), ImageDTO.class);
+			productResponse.setImage(imageDTO);
+		}
 		return productResponse;
 	}
 

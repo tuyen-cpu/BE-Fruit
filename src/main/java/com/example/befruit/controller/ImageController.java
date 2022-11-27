@@ -7,10 +7,9 @@ import com.example.befruit.service.impl.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/image")
@@ -18,10 +17,22 @@ public class ImageController {
   @Autowired
   private ImageService imageService;
   @GetMapping("")
-  public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "productId",required = false) long productId
+  public ResponseEntity<ResponseObject> getByProductId(@RequestParam(name = "productId",required = false) long productId
   ){
     try{
       ImageDTO image = imageService.getByProductId(productId);
+      return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",image));
+
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+    }
+  }
+  @GetMapping("/{productId}")
+  public ResponseEntity<ResponseObject> getAllByProductId(@PathVariable(name = "productId") long productId
+  ){
+    try{
+      List<ImageDTO> image = imageService.getAllByProductId(productId);
       return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",image));
 
     }catch (Exception e){

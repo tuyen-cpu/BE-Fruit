@@ -24,7 +24,6 @@ public class ProductController {
 			if (categoryId == 0) {
 				products = productService.getAll(price, page, size);
 			} else {
-				System.out.println("có cate");
 				products = productService.getAllByCategoryId(categoryId, price, page, size);
 			}
 

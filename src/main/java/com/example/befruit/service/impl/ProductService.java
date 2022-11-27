@@ -21,14 +21,16 @@ public class ProductService implements IProductService {
 
 	@Override
 	public Page<ProductResponse> getAllByCategoryId(Long id, Long price, Integer page, Integer size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Pageable pageable = PageRequest.of(page, size);
+//		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 		Page<Product> products = productRepo.findAllByCategoryIdAndPriceLessThanEqual(id, price, pageable);
 		return productConverter.convertToResponse(products);
 	}
 
 	@Override
 	public Page<ProductResponse> getAll(Long price, Integer page, Integer size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Pageable pageable = PageRequest.of(page, size);
+//		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 		return productConverter.convertToResponse(productRepo.findAllByPriceLessThanEqual(price, pageable));
 	}
 

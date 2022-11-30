@@ -1,6 +1,7 @@
 package com.example.befruit.controller;
 
 import com.example.befruit.dto.response.ProductResponse;
+import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ public class ProductController {
 		try {
 			Page<ProductResponse> products = null;
 			if (categoryId == 0) {
-				products = productService.getAll(price, page, size);
+				products = productService.getAll(price, EStatus.ACTIVE.getName(), page, size);
 			} else {
-				products = productService.getAllByCategoryId(categoryId, price, page, size);
+				products = productService.getAllByCategoryId(categoryId, price, EStatus.ACTIVE.getName(), page, size);
 			}
 
 			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", products));

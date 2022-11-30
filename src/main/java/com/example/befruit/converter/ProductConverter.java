@@ -1,6 +1,7 @@
 package com.example.befruit.converter;
 
 import com.example.befruit.dto.ImageDTO;
+import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Product;
 import org.modelmapper.ModelMapper;
@@ -17,9 +18,12 @@ public class ProductConverter {
 		return modelMapper.map(productResponse, Product.class);
 	}
 
+	public Product convertToEntity(ProductRequest productRequest) {
+		return modelMapper.map(productRequest, Product.class);
+	}
 	public ProductResponse convertToResponse(Product product) {
 		ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
-		if(product.getImages().size()>0){
+		if(product.getImages()!=null&&product.getImages().size()>0){
 			ImageDTO imageDTO = modelMapper.map(product.getImages().get(0), ImageDTO.class);
 			productResponse.setImage(imageDTO);
 		}

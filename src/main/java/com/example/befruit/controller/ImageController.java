@@ -2,6 +2,7 @@ package com.example.befruit.controller;
 
 import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.response.ProductResponse;
+import com.example.befruit.entity.Image;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,18 @@ public class ImageController {
     try{
       List<ImageDTO> image = imageService.getAllByProductId(productId);
       return ResponseEntity.ok().body(new ResponseObject("ok","Get image successful!",image));
+
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
+    }
+  }
+  @PostMapping("/add")
+  public ResponseEntity<ResponseObject> getAllByProductId(@RequestBody List<ImageDTO> imageDTOs
+  ){
+    try{
+      List<ImageDTO> imagesResult = imageService.add(imageDTOs);
+      return ResponseEntity.ok().body(new ResponseObject("ok","Add images successful!",imagesResult));
 
     }catch (Exception e){
       return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));

@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductResponse {
-	private Integer id;
+	private Long id;
 	private String name;
 	private Long price;
 	private String description;

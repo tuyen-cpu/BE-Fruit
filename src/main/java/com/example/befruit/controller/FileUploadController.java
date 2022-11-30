@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.IStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,17 +30,20 @@ public class FileUploadController {
 	private IStorageService storageService;
 
 	@PostMapping("")
-	public ResponseEntity<List<String>> uploadFile(@RequestParam("file")MultipartFile[] file){
+	public ResponseEntity<ResponseObject> uploadFile(@RequestParam("file")MultipartFile[] file){
 		List<String> listImage = new ArrayList<>();
 		try{
-			for(int i=0;i<file.length;i++){
-				String generatedFileName = storageService.storeFile(file[i]);
+			for (MultipartFile multipartFile : file) {
+				String generatedFileName = storageService.storeFile(multipartFile);
 				listImage.add(generatedFileName);
 			}
 
-			return new ResponseEntity<>(listImage, HttpStatus.OK);
+			return ResponseEntity.ok().body(new ResponseObject("ok","Upload image successful!",listImage));
+
 		}catch(Exception e){
-			return new ResponseEntity<>(listImage, HttpStatus.NOT_IMPLEMENTED);
+
+			return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
 		}
 	}
 	@GetMapping("/files/{fileName:.+}")

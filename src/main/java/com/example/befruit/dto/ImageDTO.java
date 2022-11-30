@@ -13,5 +13,5 @@ import java.io.Serializable;
 public class ImageDTO implements Serializable {
 	private Integer id;
 	private String link;
-
+	private Long productId;
 }

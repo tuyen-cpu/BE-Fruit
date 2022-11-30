@@ -8,4 +8,6 @@ public interface IImageService {
 	List<ImageDTO> getAllByProductId(Long id);
 
 	ImageDTO getByProductId(Long id);
+	ImageDTO add(ImageDTO imageDTO);
+	List<ImageDTO> add(List<ImageDTO> imageDTOs);
 }

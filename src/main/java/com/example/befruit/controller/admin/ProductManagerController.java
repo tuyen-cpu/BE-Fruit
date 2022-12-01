@@ -84,35 +84,5 @@ public class ProductManagerController {
 		}
 
 	}
-	@PutMapping(value = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-	public ResponseEntity<ResponseObject> update(@RequestPart("product") String productRequest, @RequestPart(value = "file",required = false) MultipartFile[] file) throws JsonProcessingException {
-		try {
 
-			ObjectMapper objectMapper = new ObjectMapper();
-			ProductRequest product = objectMapper.readValue(productRequest, ProductRequest.class);
-
-			ProductResponse productResponse = productService.add(product);
-			if(file!=null && file.length>0){
-				List<String> listImage = new ArrayList<>();
-				for (MultipartFile multipartFile : file) {
-					String generatedFileName = storageService.storeFile(multipartFile);
-					listImage.add(generatedFileName);
-				}
-				if(imageService.getSizeByProductId(product.getId())+file.length>MAX_NUMBER_IMAGE){
-					throw new RuntimeException("The allowed number of photos has been exceeded (maximum 5 photos)");
-				}
-				List<ImageDTO> imageDTOs = imageService.add(listImage.stream().map(e -> new ImageDTO(null, e, productResponse.getId())).collect(Collectors.toList()));
-				imageService.add(imageDTOs);
-			}
-
-			ProductResponse result = productService.getById(productResponse.getId());
-			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", result));
-
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("faild", e.getMessage(), ""));
-
-		}
-
-	}
 }

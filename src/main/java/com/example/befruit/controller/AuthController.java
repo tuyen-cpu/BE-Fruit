@@ -27,11 +27,10 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +61,7 @@ public class AuthController {
 			UserDetail userDetail = (UserDetail) authentication.getPrincipal();
 
 			//generate access token
+
 			String jwt = jwtUtils.generateJwtToken(userDetail);
 
 			//generate refresh token
@@ -87,7 +87,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/google")
-	public ResponseEntity<ResponseObject> google(@RequestBody TokenDTO tokenDTO) throws IOException {
+	public ResponseEntity<ResponseObject> google(@RequestBody TokenDTO tokenDTO) {
 
 		try {
 			final NetHttpTransport transport = new NetHttpTransport();
@@ -98,9 +98,9 @@ public class AuthController {
 
 			User uu = userService.getUserByEmail(payload.getEmail());
 			UserDetail userDetail;
-			String jwt = "";
-			String refreshToken = "";
-			List<String> roles = null;
+			String jwt;
+			String refreshToken;
+			List<String> roles;
 			if (uu == null) {
 				System.out.println("chưa ton tai mai: " + payload.getEmail());
 				UserDTO user = new UserDTO();
@@ -109,26 +109,18 @@ public class AuthController {
 				user.setFirstName("Random");
 				userService.register(user, urlFrontend, false);
 				userDetail = UserDetail.build(userService.getUserByEmail(user.getEmail()));
-				jwt = jwtUtils.generateJwtToken(userDetail);
-				refreshToken = userService.getTokenByUserId(userDetail.getId());
-				roles = userDetail.getAuthorities().stream()
-						.map(GrantedAuthority::getAuthority)
-						.collect(Collectors.toList());
 
 			} else {
 				userDetail = UserDetail.build(uu);
-				jwt = jwtUtils.generateJwtToken(userDetail);
-				refreshToken = userService.getTokenByUserId(userDetail.getId());
-				roles = userDetail.getAuthorities().stream()
-						.map(GrantedAuthority::getAuthority)
-						.collect(Collectors.toList());
 			}
-
+			jwt = jwtUtils.generateJwtToken(userDetail);
+			refreshToken = userService.getTokenByUserId(userDetail.getId());
+			roles = userDetail.getAuthorities().stream()
+					.map(GrantedAuthority::getAuthority)
+					.collect(Collectors.toList());
 			return ResponseEntity.ok().body(new ResponseObject("ok", "Login with google success!", new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(),userDetail.getFirstName(),userDetail.getLastName(), roles)));
-
-
 		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("faild", e.getMessage(), ""));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 
 		}
 
@@ -165,8 +157,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/process_register")
-	public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user)
-			throws UnsupportedEncodingException, MessagingException {
+	public ResponseEntity<ResponseObject> processRegister(@RequestBody UserDTO user) {
 		try {
 			userService.register(user, urlFrontend, true);
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "Register successful. Please check your mail to verify!", user));

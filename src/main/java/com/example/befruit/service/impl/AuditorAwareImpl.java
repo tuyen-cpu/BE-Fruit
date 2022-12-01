@@ -1,9 +1,6 @@
 package com.example.befruit.service.impl;
 
 import com.example.befruit.sercurity.service.UserDetail;
-import org.slf4j.Logger;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,10 +17,16 @@ public class AuditorAwareImpl implements AuditorAware<String>  {
 				.getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()) {
-			return null;
+			return Optional.empty();
+		}
+		try{
+			UserDetail u =(UserDetail) authentication.getPrincipal();
+			return Optional.of(u.getUsername());
+		}catch (Exception e){
+			return Optional.empty();
 		}
 
-		return Optional.of(((UserDetail) authentication.getPrincipal()).getUsername());
+
 	}
 
 

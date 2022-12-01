@@ -132,6 +132,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
+	@Transactional
 	public String getTokenByUserId(Long id) {
 		User user = userRepo.findById(id).get();
 		user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));

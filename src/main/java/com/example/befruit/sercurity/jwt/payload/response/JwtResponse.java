@@ -1,11 +1,15 @@
 package com.example.befruit.sercurity.jwt.payload.response;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
-@Data
-public class JwtResponse {
+@Setter
+@Getter
+public class JwtResponse implements Serializable {
 	private String token;
 	private String type = "Bearer";
 	private String refreshToken;

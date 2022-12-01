@@ -1,5 +1,6 @@
 package com.example.befruit.dto.request;
 
+import com.example.befruit.dto.CategoryDTO;
 import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.response.CategoryResponse;
 import com.example.befruit.entity.Image;
@@ -22,6 +23,6 @@ public class ProductRequest implements Serializable {
 	private Integer discount;
 	private Integer quantity;
 	private Integer status;
-	private Long categoryId;
+	private CategoryResponse category;
 	private List<ImageDTO> images;
 }

@@ -40,4 +40,9 @@ public class ImageService implements IImageService {
 		List<Image> imagesAdded	=imageRepo.saveAll(images);
 		return imagesAdded.stream().map(e->imageConverter.convertToDto(e)).collect(Collectors.toList());
 	}
+
+	@Override
+	public Integer getSizeByProductId(Long productId) {
+		return imageRepo.getSizeByProductId(productId);
+	}
 }

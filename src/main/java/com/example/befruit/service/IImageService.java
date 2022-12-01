@@ -10,4 +10,6 @@ public interface IImageService {
 	ImageDTO getByProductId(Long id);
 	ImageDTO add(ImageDTO imageDTO);
 	List<ImageDTO> add(List<ImageDTO> imageDTOs);
+
+	Integer getSizeByProductId(Long productId);
 }

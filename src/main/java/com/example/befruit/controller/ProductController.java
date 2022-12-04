@@ -6,6 +6,7 @@ import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class ProductController {
 																																	 @RequestParam(name = "page", defaultValue = "0") int page,
 																																	 @RequestParam(name = "size", defaultValue = "10") int size) {
 		try {
-			Page<ProductResponse> products = null;
+			Page<ProductResponse> products;
 			if (categoryId == 0) {
 				products = productService.getAll(price, EStatus.ACTIVE.getName(), page, size);
 			} else {
@@ -56,6 +57,18 @@ public class ProductController {
 		try {
 			ProductResponse product = productService.getById(id);
 			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product" + id + "successfully!", product));
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+	}
+	@GetMapping("")
+	public ResponseEntity<ResponseObject> getBySlug(@RequestParam(name = "slug") String slug ) {
+
+		try {
+			ProductResponse product = productService.getBySlug(slug);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product" + slug + "successfully!", product));
 
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));

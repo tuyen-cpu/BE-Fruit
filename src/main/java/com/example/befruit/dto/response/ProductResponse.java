@@ -21,6 +21,7 @@ public class ProductResponse {
 	private Integer discount;
 	private Integer quantity;
 	private Integer status;
+	private String slug;
 	private CategoryResponse category;
 	private ImageDTO image;
 }

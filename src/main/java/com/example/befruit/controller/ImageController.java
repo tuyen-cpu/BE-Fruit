@@ -1,12 +1,9 @@
 package com.example.befruit.controller;
 
 import com.example.befruit.dto.ImageDTO;
-import com.example.befruit.dto.response.ProductResponse;
-import com.example.befruit.entity.Image;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

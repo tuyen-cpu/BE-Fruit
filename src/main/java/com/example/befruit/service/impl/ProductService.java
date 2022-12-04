@@ -1,11 +1,8 @@
 package com.example.befruit.service.impl;
 
 import com.example.befruit.converter.ProductConverter;
-import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
-import com.example.befruit.entity.EStatus;
-import com.example.befruit.entity.Image;
 import com.example.befruit.entity.Product;
 import com.example.befruit.repo.ProductRepo;
 import com.example.befruit.service.IProductService;
@@ -16,11 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.EntityNotFoundException;
 
 @Service
 public class ProductService implements IProductService {
@@ -62,14 +56,20 @@ if(status==null){
 	@Override
 	public ProductResponse getById(Long id) {
 		try {
-			return productConverter.convertToResponse(productRepo.findById(id).get());
+			return productConverter.convertToResponse(productRepo.findById(id)
+					.orElseThrow(() -> new EntityNotFoundException("Product "+id+" does not exist!")));
 		} catch (Exception e) {
 			throw new RuntimeException("Product " + id + " is not found!");
 		}
 
 	}
 
-@Override
+	@Override
+	public ProductResponse getBySlug(String slug) {
+		return productConverter.convertToResponse(productRepo.findBySlug(slug));
+	}
+
+	@Override
 
 public ProductResponse add(ProductRequest productRequest) {
 	try {

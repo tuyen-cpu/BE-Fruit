@@ -23,6 +23,7 @@ public class ProductRequest implements Serializable {
 	private Integer discount;
 	private Integer quantity;
 	private Integer status;
+	private String slug;
 	private CategoryResponse category;
 	private List<ImageDTO> images;
 }

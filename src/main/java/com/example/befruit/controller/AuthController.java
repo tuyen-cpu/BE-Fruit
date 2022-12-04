@@ -27,8 +27,6 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,7 +47,7 @@ public class AuthController {
 	private String urlFrontend;
 	@Value("${google.clientId}")
 	private String googleClientId;
-	@Value("${google.secret}")
+	@Value(value = "${google.secret}")
 	private String password;
 
 	@PostMapping("/login")
@@ -61,7 +59,6 @@ public class AuthController {
 			UserDetail userDetail = (UserDetail) authentication.getPrincipal();
 
 			//generate access token
-
 			String jwt = jwtUtils.generateJwtToken(userDetail);
 
 			//generate refresh token

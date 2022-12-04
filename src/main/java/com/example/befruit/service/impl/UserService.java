@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.persistence.EntityNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
@@ -48,7 +49,7 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserDTO add(User user) {
-		return null;
+		return userConverter.convertToDto(userRepo.save(user));
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class UserService implements IUserService {
 			user.setToken(null);
 			user.setExpiryDate(null);
 			userRepo.save(user);
-			throw new TokenRefreshException(token, "Refresh token was expired. Please make a new signin request");
+			throw new TokenRefreshException(token, "Refresh token was expired. Please make a new signing request");
 
 		}
 		return user;
@@ -88,7 +89,7 @@ public class UserService implements IUserService {
 			return;
 		}
 		if (userCheck != null && userCheck.getEnabled()) {
-			throw new RuntimeException("Email đã được đăng ký!");
+			throw new RuntimeException("Email already exists!");
 		}
        /* if (userRepo.existsByUsername(userDTO.getEmail())){
             throw new RuntimeException("Username đã được đăng ký!");
@@ -104,7 +105,6 @@ public class UserService implements IUserService {
 		user.setToken(UUID.randomUUID().toString());
 		String randomCode = RandomString.make(64);
 		user.setVerificationCode(randomCode);
-
 
 		if (isSendMail) {
 			user.setEnabled(false);
@@ -167,7 +167,7 @@ public class UserService implements IUserService {
 	@Override
 	public void resetPassword(String verificationCode, String password) {
 		User user = userRepo.findByVerificationCode(verificationCode);
-		if (user == null) throw new RuntimeException("Tài khoản không tồn tại!");
+		if (user == null) throw new RuntimeException("Account does not exist!");
 		user.setPassword(encodedPassword(password));
 		user.setVerificationCode(null);
 		userRepo.save(user);
@@ -193,7 +193,7 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserDTO update(UserDTO userDTO) {
-		User user = userRepo.findById(userDTO.getId()).get();
+		User user = userRepo.findById(userDTO.getId()).orElseThrow(() -> new EntityNotFoundException("User "+userDTO.getId()+" does not exist!"));
 		user.setFirstName(userDTO.getFirstName());
 		user.setLastName(userDTO.getLastName());
 		User userSaved = userRepo.save(user);

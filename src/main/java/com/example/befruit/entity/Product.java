@@ -25,6 +25,7 @@ public class Product implements Serializable {
 	private Integer discount;
 	private Integer quantity;
 	private Integer status;
+	private String slug;
 	@ManyToOne(targetEntity = Category.class)
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;

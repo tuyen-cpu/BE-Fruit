@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,8 @@ public class CartItemService implements ICartService {
 
 		if (quantityProduct >= cartItemRequest.getQuantity()) {
 			CartItem cartItem = cartItemConverter.convertToEntity(cartItemRequest);
-			Product product1 = productRepo.findById(cartItem.getProduct().getId()).get();
+			Product product1 = productRepo.findById(cartItem.getProduct().getId())
+					.orElseThrow(() -> new EntityNotFoundException("Product "+cartItem.getProduct().getId()+" does not exist!"));
 			cartItem.setProduct(product1);
 			CartItem add = cartItemRepo.save(cartItem);
 
@@ -70,7 +72,8 @@ public class CartItemService implements ICartService {
 	}
 
 	private Product getProductById(Long id) {
-		return productRepo.findById(id).get();
+		return productRepo.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Product "+id+" does not exist!"));
 	}
 
 	@Override

@@ -22,6 +22,7 @@ public class Category implements Serializable {
 	private Long id;
 	private String name;
 	private Integer status;
+	private String slug;
 	@OneToMany(mappedBy = "category", targetEntity = Product.class, cascade = CascadeType.ALL)
 	private List<Product> products = new ArrayList<>();
 }

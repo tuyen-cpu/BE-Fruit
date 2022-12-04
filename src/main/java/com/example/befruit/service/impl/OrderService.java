@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,8 @@ public class OrderService implements IOrderService {
 
 			ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
-			User user = userRepo.findById(orderRequest.getUserId()).get();
+			User user = userRepo.findById(orderRequest.getUserId())
+					.orElseThrow(() -> new EntityNotFoundException("User "+orderRequest.getUserId()+" does not exist!"));
 			Payment p = orderRequest.getPayment();
 			System.out.println("payment: "+p.getEmail());
 			Bill order = new Bill();
@@ -78,10 +80,8 @@ public class OrderService implements IOrderService {
 			long total = 0L;
 
 			List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream().map(dto -> orderDetailConverter.convertToEntity(dto)).collect(Collectors.toList());
-			orderDetails.forEach(e -> {
-				e.setBill(order);
+			orderDetails.forEach(e -> e.setBill(order));
 
-			});
 			for (OrderDetail orderDetail : orderDetails) {
 				System.out.println(orderDetail.getQuantity() + "_" + orderDetail.getPrice());
 				total += (orderDetail.getPrice() - orderDetail.getPrice() * orderDetail.getDiscount() / 100) * orderDetail.getQuantity();
@@ -119,13 +119,15 @@ public class OrderService implements IOrderService {
 
 	@Override
 	public OrderResponse getById(Long id) {
-		return orderConverter.convertToResponse(orderRepo.findById(id).get());
+		return orderConverter.convertToResponse(orderRepo.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("User "+id+" does not exist!")));
 	}
 
 	@Override
 	public OrderResponse updateStatusShipping(Long id, String status) {
 		ShippingStatus shippingStatus = shippingStatusService.getByName(status);
-		Bill order = orderRepo.findById(id).get();
+		Bill order = orderRepo.findById(id)
+					.orElseThrow(() -> new EntityNotFoundException("User "+id+" does not exist!"));
 		order.setShippingStatus(shippingStatus);
 		return orderConverter.convertToResponse(orderRepo.save(order));
 	}

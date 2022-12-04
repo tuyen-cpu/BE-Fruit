@@ -48,7 +48,7 @@ public class UserController {
 					.body(new ResponseObject("ok", "Update successful!", user));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 
 

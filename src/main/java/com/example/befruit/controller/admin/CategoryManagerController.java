@@ -1,7 +1,6 @@
 package com.example.befruit.controller.admin;
 
 import com.example.befruit.dto.CategoryDTO;
-import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

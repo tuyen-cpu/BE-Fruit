@@ -11,6 +11,7 @@ public interface IProductService {
 
 	Page<ProductResponse> search(String key, Integer page, Integer size);
 	ProductResponse getById(Long id);
+	ProductResponse getBySlug(String slug);
 	ProductResponse add(ProductRequest productRequest);
 
 }

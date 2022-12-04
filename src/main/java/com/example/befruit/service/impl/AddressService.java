@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,8 @@ public class AddressService implements IAddressService {
 
 	@Override
 	public AddressDTO get(Long id) {
-		return addressConverter.convertToDTO(addressRepo.findById(id).get());
+		return addressConverter.convertToDTO(addressRepo.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Address "+id+" does not exist!")));
 	}
 
 	@Transactional
@@ -55,7 +57,8 @@ public class AddressService implements IAddressService {
 	@Override
 	public AddressDTO update(AddressDTO addressDTO) {
 		this. setDefaultOnlyOne();
-		Address address = addressRepo.findById(addressDTO.getId()).get();
+		Address address = addressRepo.findById(addressDTO.getId())
+				.orElseThrow(() -> new EntityNotFoundException("Address "+addressDTO.getId()+" does not exist!"));
 
 		address.setIsDefault(addressDTO.getIsDefault());
 		address.setStatus(addressDTO.getStatus());
@@ -65,7 +68,8 @@ public class AddressService implements IAddressService {
 		address.setFirstName(addressDTO.getFirstName());
 		address.setLastName(addressDTO.getLastName());
 		address.setDescription(addressDTO.getDescription());
-		User user = userRepo.findById(addressDTO.getUserId()).get();
+		User user = userRepo.findById(addressDTO.getUserId())
+				.orElseThrow(() -> new EntityNotFoundException("User "+addressDTO.getUserId()+" does not exist!"));
 		address.setUser(user);
 		address.setStreet(addressDTO.getStreet());
 		address.setPhone(addressDTO.getPhone());

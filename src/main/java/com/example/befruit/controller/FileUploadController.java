@@ -62,9 +62,8 @@ public class FileUploadController {
 			List<String> urls = storageService.loadAll()
 					.map(path->{
 						//convert fileName to url (send request "readDetailFile")
-						String urlPath = MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
+						return MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
 								"readDetailFile",path.getFileName().toString()).build().toUri().toString();
-						return urlPath;
 					}).collect(Collectors.toList());
 			return new ResponseEntity<>(urls,HttpStatus.OK);
 		}catch(Exception e){
@@ -75,7 +74,7 @@ public class FileUploadController {
 	@PostMapping("/multi")
 	public ResponseEntity<List<String>> uploadFile(@RequestParam("files") List<MultipartFile> files){
 		try{
-			List<String> filenames = new ArrayList<String>();
+			List<String> filenames = new ArrayList<>();
 			for (MultipartFile file : files) {
 				String generatedFileName = storageService.storeFile(file);
 				filenames.add(generatedFileName);

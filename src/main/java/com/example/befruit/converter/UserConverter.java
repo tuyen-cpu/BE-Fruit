@@ -4,6 +4,7 @@ import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.Product;
+import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class UserConverter {
 	}
 	public UserResponse convertToResponse(User entity) {
 		UserResponse userResponse=modelMapper.map(entity, UserResponse.class);
-		List<String> role =entity.getRoles().stream().map(e->e.getName()).collect(Collectors.toList());
+		List<String> role =entity.getRoles().stream().map(Role::getName).collect(Collectors.toList());
 		userResponse.setRoles(role);
 		return userResponse;
 	}

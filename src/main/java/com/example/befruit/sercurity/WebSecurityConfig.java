@@ -3,6 +3,7 @@ package com.example.befruit.sercurity;
 import com.example.befruit.entity.ERole;
 import com.example.befruit.sercurity.jwt.AuthEntryPointJwt;
 import com.example.befruit.sercurity.jwt.AuthTokenFilter;
+import com.example.befruit.sercurity.service.CustomAccessDeniedHandler;
 import com.example.befruit.sercurity.service.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -59,6 +61,24 @@ public class WebSecurityConfig {
 		return authConfiguration.getAuthenticationManager();
 	}
 
+	//	@Bean
+//	public RoleHierarchy roleHierarchy() {
+//		RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+//		String hierarchy = "ROLE_ADMIN > ROLE_MANAGER \n ROLE_MANAGER > ROLE_CLIENT";
+//		roleHierarchy.setHierarchy(hierarchy);
+//		return roleHierarchy;
+//	}
+//	@Bean
+//	public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
+//		DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+//		expressionHandler.setRoleHierarchy(roleHierarchy());
+//		return expressionHandler;
+//	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new CustomAccessDeniedHandler();
+	}
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -71,17 +91,20 @@ public class WebSecurityConfig {
 		corsConfiguration.setExposedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization",
 				"Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		String[] admins = {ERole.ADMIN.name(),ERole.MANAGER.name()};
+		String[] admins = {ERole.ADMIN.name(), ERole.MANAGER.name()};
 		http.csrf().disable().cors().configurationSource(request -> corsConfiguration).and()
 				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+				.and()
 				.authorizeRequests()
 				.antMatchers("/api/auth/**").permitAll()
 				.antMatchers("/api/product/**").permitAll()
 				.antMatchers("/api/cart/add").permitAll()
-				.antMatchers("/api/admin/*").hasAnyRole(admins)
-				.antMatchers("/api/**").permitAll()
-				.anyRequest().authenticated()
+				.antMatchers("/api/order/**").authenticated()
+				.antMatchers("/api/admin/**").hasAuthority(ERole.ADMIN.getName())
+//				.antMatchers("/api/**").permitAll()
+//				.anyRequest().authenticated()
 				.and();
 
 //        http.headers().frameOptions().sameOrigin();

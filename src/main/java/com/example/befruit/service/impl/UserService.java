@@ -10,7 +10,12 @@ import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.repo.UserRepo;
 import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
 import com.example.befruit.service.IUserService;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,10 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
+import java.beans.FeatureDescriptor;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserService implements IUserService {
@@ -43,13 +53,38 @@ public class UserService implements IUserService {
 	private UserConverter userConverter;
 
 	@Autowired
+	private RoleRepo repo;
+	@Autowired
 	private JavaMailSender mailSender;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Override
-	public UserDTO add(User user) {
-		return userConverter.convertToDto(userRepo.save(user));
+	public UserResponse add(UserDTO userDTO) {
+		List<Role> roles = new ArrayList<>();
+		Arrays.stream(userDTO.getRoles()).map(role->roles.add(roleRepo.findByName(role))).collect(Collectors.toList());
+		User user;
+		if(userDTO.getId()!=null){
+			user=userRepo.findById(userDTO.getId())
+					.orElseThrow(() -> new EntityNotFoundException("Product "+userDTO.getId()+" does not exist!"));
+			BeanUtils.copyProperties(userDTO,user,"email");
+//			user.setFirstName(userDTO.getFirstName());
+//			user.setLastName(userDTO.getLastName());
+//			user.setStatus(userDTO.getStatus());
+//			user.setEmail(userDTO.getEmail());
+
+		}else{
+		 user = userConverter.convertToEntity(userDTO);
+	}
+
+		user.setRoles(roles);
+		user.setPassword(encodedPassword(123456+""));
+		user.setEnabled(true);
+		user.setUserName(UUID.randomUUID().toString());
+		System.out.println(user.getFirstName()+" "+user.getLastName());
+		User userAdded =userRepo.save(user);
+		System.out.println(userAdded.getFirstName()+" "+userAdded.getLastName());
+		return userConverter.convertToResponse(userAdded);
 	}
 
 	@Override
@@ -273,5 +308,16 @@ public class UserService implements IUserService {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static void myCopyProperties(Object src, Object target) {
+		BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
+	}
+	private static String[] getNullPropertyNames(Object source) {
+		final BeanWrapper wrappedSource = new BeanWrapperImpl(source);
+		return Stream.of(wrappedSource.getPropertyDescriptors())
+				.map(FeatureDescriptor::getName)
+				.filter(propertyName -> wrappedSource.getPropertyValue(propertyName) == null)
+				.toArray(String[]::new);
 	}
 }

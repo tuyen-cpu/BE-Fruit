@@ -16,10 +16,6 @@ import java.util.List;
 @Table(name = "user")
 public class User extends Base<String> implements Serializable {
 	//    @JsonIgnore
-	@ManyToMany
-			(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	List<Role> roles = new ArrayList<>();
 
 	private String email;
 	private String userName;
@@ -34,6 +30,10 @@ public class User extends Base<String> implements Serializable {
 	private Instant expiryDate;
 	@Column(columnDefinition = "integer default 1")
 	private Integer status;
+	@ManyToMany
+			(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	List<Role> roles = new ArrayList<>();
 
 	//    @OneToMany(cascade = CascadeType.ALL)
 //    private List<CartItem> cartItems;

@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface IUserService {
-	UserDTO add(User user);
+	UserResponse add(UserDTO userDTO);
 
 	List<UserDTO> getUsers();
 

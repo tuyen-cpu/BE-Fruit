@@ -9,6 +9,7 @@ import com.example.befruit.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -46,6 +47,7 @@ public class OrderController {
 
     }
   }
+//  @PostAuthorize("returnObject.user.id == authentication.principal.id")
   @GetMapping("/{id}")
   public ResponseEntity<ResponseObject> getById(@PathVariable(name ="id" ,required = false) long id){
     try{

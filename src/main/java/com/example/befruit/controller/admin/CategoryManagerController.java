@@ -17,15 +17,15 @@ public class CategoryManagerController {
 	@Autowired
 	private ICategoryService categoryService;
 
-	@GetMapping("/all")
-	public ResponseEntity<ResponseObject> getAll( @RequestParam(name = "page", defaultValue = "0") int page,
-																								@RequestParam(name = "size", defaultValue = "20") int size) {
-		try {
-			Page<CategoryDTO> categoryDTOS =  categoryService.getAll(null, page, size);
-			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", categoryDTOS));
-
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
-		}
-	}
+//	@GetMapping("/all")
+//	public ResponseEntity<ResponseObject> getAll( @RequestParam(name = "page", defaultValue = "0") int page,
+//																								@RequestParam(name = "size", defaultValue = "20") int size) {
+//		try {
+//			Page<> categoryDTOS =  categoryService.getAll(null, page, size);
+//			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", categoryDTOS));
+//
+//		} catch (Exception e) {
+//			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+//		}
+//	}
 }

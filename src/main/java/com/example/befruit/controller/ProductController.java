@@ -10,33 +10,54 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	@GetMapping("/all")
-	public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "categoryId", required = false) long categoryId,
-																																	 @RequestParam(name = "price", required = false) long price,
-																																	 @RequestParam(name = "page", defaultValue = "0") int page,
-																																	 @RequestParam(name = "size", defaultValue = "10") int size) {
-		try {
-			Page<ProductResponse> products;
-			if (categoryId == 0) {
-				products = productService.getAll(price, EStatus.ACTIVE.getName(), page, size);
-			} else {
-				products = productService.getAllByCategoryId(categoryId, price, EStatus.ACTIVE.getName(), page, size);
-			}
-
-			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", products));
-
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
-
+//	@GetMapping("/all")
+//	public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "categoryId", required = false) long categoryId,
+//																																	 @RequestParam(name = "price", required = false) long price,
+//																																	 @RequestParam(name = "page", defaultValue = "0") int page,
+//																																	 @RequestParam(name = "size", defaultValue = "10") int size) {
+//		try {
+//			Page<ProductResponse> products;
+//			if (categoryId == 0) {
+//				products = productService.getAll(price, EStatus.ACTIVE.getName(), page, size);
+//			} else {
+//				products = productService.getAllByCategoryId(categoryId, price, EStatus.ACTIVE.getName(), page, size);
+//			}
+//
+//			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", products));
+//
+//		} catch (Exception e) {
+//			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+//
+//		}
+//	}
+@GetMapping("/all")
+public ResponseEntity<ResponseObject> getAllByCategorySlugAndPrice(@RequestParam(name = "categorySlug", required = false) String slug,
+																																 @RequestParam(name = "price", required = false) long price,
+																																 @RequestParam(name = "page", defaultValue = "0") int page,
+																																 @RequestParam(name = "size", defaultValue = "10") int size) {
+	try {
+		Page<ProductResponse> products;
+		if (slug.equals("null")) {
+			products = productService.getAll(price, EStatus.ACTIVE.getName(), page, size);
+		} else {
+			products = productService.getAllByCategorySlug(slug, price, EStatus.ACTIVE.getName(), page, size);
 		}
-	}
 
+		return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", products));
+
+	} catch (Exception e) {
+		return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+	}
+}
 	@GetMapping("/search")
 	public ResponseEntity<ResponseObject> getAllByCategoryIdAndPrice(@RequestParam(name = "key", required = false) String key,
 																																	 @RequestParam(name = "page", defaultValue = "0") int page,
@@ -63,6 +84,7 @@ public class ProductController {
 
 		}
 	}
+
 	@GetMapping("")
 	public ResponseEntity<ResponseObject> getBySlug(@RequestParam(name = "slug") String slug ) {
 

@@ -14,9 +14,11 @@ import java.util.List;
 public interface ProductRepo extends JpaRepository<Product, Long> {
 //	   @Query("SELECT p FROM Product p WHERE p.category.id = ?1 and p.price<=?2")
 	Page<Product> findAllByCategoryIdAndPriceLessThanEqualAndStatus(Long id, Long price,Integer status, Pageable pageable);
-//	   @Query("SELECT p FROM Product p WHERE p.price<=?1")
+	Page<Product> findAllByCategorySlugAndPriceLessThanEqualAndStatus(String slug, Long price,Integer status, Pageable pageable);
+	//	   @Query("SELECT p FROM Product p WHERE p.price<=?1")
 	Page<Product> findAllByPriceLessThanEqualAndStatus(Long price,Integer status, Pageable pageable);
 	Page<Product> findAllByCategoryIdAndPriceLessThanEqual(Long id, Long price, Pageable pageable);
+	Page<Product> findAllByCategorySlugAndPriceLessThanEqual(String slug, Long price, Pageable pageable);
 	//	   @Query("SELECT p FROM Product p WHERE p.price<=?1")
 	Page<Product> findAllByPriceLessThanEqual(Long price, Pageable pageable);
 

@@ -46,29 +46,13 @@ public class OrderService implements IOrderService {
 	@Transactional
 	@Override
 	public Boolean addOrder(OrderRequest orderRequest) {
-
 		try {
-//			AddressDTO addressResponse = orderRequest.getAddress();
-//			Address address = null;
-//			if (addressResponse.getId() == null) {
-//				if(addressResponse.getIsDefault()==null){
-//					addressResponse.setIsDefault(0);
-//				}
-//				address = addressRepo.save(addressConverter.convertToEntity(addressResponse));
-
-//			} else {
-//				address = addressConverter.convertToEntity(addressResponse);
-//			}
-//			System.out.println(address.getDistrict());
-//			System.out.println(address.getCity());
-//			System.out.println(address.getWard());
 
 			ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
 			User user = userRepo.findById(orderRequest.getUserId())
 					.orElseThrow(() -> new EntityNotFoundException("User "+orderRequest.getUserId()+" does not exist!"));
 			Payment p = orderRequest.getPayment();
-			System.out.println("payment: "+p.getEmail());
 			Bill order = new Bill();
 
 			order.setStatus(EStatus.ACTIVE.getName());
@@ -76,22 +60,17 @@ public class OrderService implements IOrderService {
 			order.setUser(user);
 			order.setAddress(orderRequest.getAddress());
 			order.setDescription(orderRequest.getDescription());
-
 			long total = 0L;
-
 			List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream().map(dto -> orderDetailConverter.convertToEntity(dto)).collect(Collectors.toList());
 			orderDetails.forEach(e -> e.setBill(order));
 
 			for (OrderDetail orderDetail : orderDetails) {
-				System.out.println(orderDetail.getQuantity() + "_" + orderDetail.getPrice());
 				total += (orderDetail.getPrice() - orderDetail.getPrice() * orderDetail.getDiscount() / 100) * orderDetail.getQuantity();
 			}
 			order.setTotal(total);
 			order.setOrderDetails(orderDetails);
 			p.setBill(order);
-			System.out.println("bill in payment "+p.getBill().getAddress()+"");
 			order.setPayment(p);
-			System.out.println(p.getId()+"tuyennn121212");
 			orderRepo.save(order);
 
 			return true;

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ICategoryService {
 	Page<CategoryDTO> getAll(Integer status,Integer page,Integer size);
+
 }

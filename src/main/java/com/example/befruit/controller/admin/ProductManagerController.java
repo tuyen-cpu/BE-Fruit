@@ -60,7 +60,9 @@ public class ProductManagerController {
 
 			ObjectMapper objectMapper = new ObjectMapper();
 			ProductRequest product = objectMapper.readValue(productRequest, ProductRequest.class);
-
+			if(productService.getBySlug(product.getSlug())!=null){
+				throw  new RuntimeException("Slug already exist!");
+			}
 			ProductResponse productResponse = productService.add(product);
 			if(file!=null && file.length>0){
 				List<String> listImage = new ArrayList<>();
@@ -69,7 +71,7 @@ public class ProductManagerController {
 					listImage.add(generatedFileName);
 				}
 				if(imageService.getSizeByProductId(product.getId())+file.length>MAX_NUMBER_IMAGE){
-					throw new RuntimeException("The allowed number of photos has been exceeded (maximum 5 photos)");
+					throw new RuntimeException("The allowed number of photos has been exceeded (maximum 5 photos)!");
 				}
 				List<ImageDTO> imageDTOs = imageService.add(listImage.stream().map(e -> new ImageDTO(null, e, productResponse.getId())).collect(Collectors.toList()));
 				imageService.add(imageDTOs);

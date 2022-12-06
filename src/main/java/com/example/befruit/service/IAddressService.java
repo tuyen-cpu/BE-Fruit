@@ -14,4 +14,5 @@ public interface IAddressService {
 	AddressDTO update(AddressDTO addressDTO);
 
 	void delete(Long id);
+	void delete(List<Long> ids);
 }

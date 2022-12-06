@@ -78,7 +78,17 @@ public class AddressService implements IAddressService {
 
 	@Override
 	public void delete(Long id) {
+		Address address =addressRepo.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Address "+id+" does not exist!"));
+		if(address.getIsDefault()==1){
+			throw	new RuntimeException("Cannot delete default address!");
+		}
 		addressRepo.deleteById(id);
 	}
+	@Override
+	@Transactional
+	public void delete(List<Long> ids) {
 
+		addressRepo.deleteAllById(ids);
+	}
 }

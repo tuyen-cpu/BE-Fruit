@@ -14,4 +14,5 @@ public class LoginDTO implements Serializable {
 	private String email;
 
 	private String password;
+
 }

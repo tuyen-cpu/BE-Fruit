@@ -37,6 +37,18 @@ if(status==null){
 	}
 
 	@Override
+	public Page<ProductResponse> getAllByCategorySlug(String slug, Long price, Integer status, Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page, size);
+//		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		if(status==null){
+			return productConverter.convertToResponse(productRepo.findAllByCategorySlugAndPriceLessThanEqual(slug, price, pageable));
+
+		}
+		return productConverter.convertToResponse(productRepo.findAllByCategorySlugAndPriceLessThanEqualAndStatus(slug, price,status, pageable));
+
+	}
+
+	@Override
 	public Page<ProductResponse> getAll(Long price,Integer status, Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size);
 //		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());

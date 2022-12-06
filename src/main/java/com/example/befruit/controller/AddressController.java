@@ -1,6 +1,7 @@
 package com.example.befruit.controller;
 
 import com.example.befruit.dto.AddressDTO;
+import com.example.befruit.entity.Address;
 import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.service.impl.AddressService;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/address")
@@ -64,6 +67,7 @@ public class AddressController {
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<ResponseObject> delete(@PathVariable("id") Long id) {
 		try {
+
 			addressService.delete(id);
 			return ResponseEntity.ok().body(new ResponseObject("ok", "Deleted address!", ""));
 
@@ -74,4 +78,18 @@ public class AddressController {
 
 
 	}
+	@DeleteMapping("/delete")
+	public ResponseEntity<ResponseObject> deleteMulti(@RequestParam("id") List<Long> ids) {
+		try {
+			addressService.delete(ids);
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Deleted address!", ""));
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+
+		}
+
+
+	}
+
 }

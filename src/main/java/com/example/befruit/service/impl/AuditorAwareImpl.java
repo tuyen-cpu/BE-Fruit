@@ -23,7 +23,7 @@ public class AuditorAwareImpl implements AuditorAware<String>  {
 			UserDetail u =(UserDetail) authentication.getPrincipal();
 			return Optional.of(u.getUsername());
 		}catch (Exception e){
-			return Optional.empty();
+			return Optional.of("");
 		}
 
 

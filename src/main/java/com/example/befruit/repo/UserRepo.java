@@ -1,13 +1,19 @@
 package com.example.befruit.repo;
 
+import com.example.befruit.entity.Product;
+import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 //@Repository
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface UserRepo extends JpaRepository<User, Long> , JpaSpecificationExecutor<User> {
 	User findByVerificationCode(String code);
 
 	User findByEmail(String email);
@@ -21,6 +27,6 @@ public interface UserRepo extends JpaRepository<User, Long> {
 	boolean existsByEmail(String email);
 
 	User findByToken(String token);
-
-
+	@Query("select count(u) from User u join u.roles r where r.name=?1")
+	Integer countByRoleName(String name);
 }

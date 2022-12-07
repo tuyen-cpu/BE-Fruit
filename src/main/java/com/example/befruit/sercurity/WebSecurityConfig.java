@@ -102,7 +102,8 @@ public class WebSecurityConfig {
 				.antMatchers("/api/product/**").permitAll()
 				.antMatchers("/api/cart/add").permitAll()
 				.antMatchers("/api/order/**").authenticated()
-				.antMatchers("/api/admin/**").hasAuthority(ERole.ADMIN.getName())
+				.antMatchers("/api/admin/**").permitAll()
+//				.hasAnyAuthority(ERole.ADMIN.getName(),ERole.MANAGER.getName())
 //				.antMatchers("/api/**").permitAll()
 //				.anyRequest().authenticated()
 				.and();

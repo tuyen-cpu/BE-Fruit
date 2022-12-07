@@ -7,6 +7,7 @@ import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.entity.User;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
+import com.example.befruit.service.impl.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -25,20 +26,22 @@ public class UserController {
 	@Autowired
 	private IUserService userService;
 	@Autowired
+	private RoleService roleService;
+	@Autowired
 	AuthenticationManager authenticationManager;
-	@GetMapping("/all")
-	public ResponseEntity<ResponseObject> user( @RequestParam(name = "page", defaultValue = "0") int page,
-																							@RequestParam(name = "size", defaultValue = "10") int size) {
-		try {
-			Page<UserResponse> user = userService.getAll(page,size);
-			return ResponseEntity.ok()
-					.body(new ResponseObject("ok", "Get user successfully!", user));
-		} catch (Exception e) {
-			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", "Get failed!", ""));
-		}
-
-	}
+//	@GetMapping("/all")
+//	public ResponseEntity<ResponseObject> user( @RequestParam(name = "page", defaultValue = "0") int page,
+//																							@RequestParam(name = "size", defaultValue = "10") int size) {
+//		try {
+//			Page<UserResponse> user = userService.getAll(page,size);
+//			return ResponseEntity.ok()
+//					.body(new ResponseObject("ok", "Get user successfully!", user));
+//		} catch (Exception e) {
+//			return ResponseEntity.badRequest()
+//					.body(new ResponseObject("ok", "Get failed!", ""));
+//		}
+//
+//	}
 	@PutMapping("/update")
 	public ResponseEntity<ResponseObject> update(@RequestBody UserDTO userDTO) {
 		System.out.println(userDTO.getFirstName());
@@ -73,5 +76,15 @@ public class UserController {
 		}
 
 
+	}
+	@GetMapping("")
+	public ResponseEntity<ResponseObject> count (@RequestParam("name") String name){
+		try{
+			return ResponseEntity.ok()
+					.body(new ResponseObject("failed", "Invalid password!", userService.countByRoleName(name)));
+		}catch (Exception e){
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
 	}
 }

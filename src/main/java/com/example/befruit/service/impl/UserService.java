@@ -8,10 +8,9 @@ import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.repo.UserRepo;
+import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
 import com.example.befruit.service.IUserService;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
@@ -59,31 +58,42 @@ public class UserService implements IUserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+
+	@Override
+	public Page<UserResponse> filter(EntitySpecification<User> productSpecification,int page,int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return userConverter.convertToResponse(userRepo.findAll(productSpecification,pageable));
+	}
 	@Override
 	public UserResponse add(UserDTO userDTO) {
+
+		if(userRepo.findByEmail(userDTO.getEmail())!=null){
+			throw new RuntimeException("Email already exists!");
+		}
 		List<Role> roles = new ArrayList<>();
 		Arrays.stream(userDTO.getRoles()).map(role->roles.add(roleRepo.findByName(role))).collect(Collectors.toList());
-		User user;
-		if(userDTO.getId()!=null){
-			user=userRepo.findById(userDTO.getId())
-					.orElseThrow(() -> new EntityNotFoundException("Product "+userDTO.getId()+" does not exist!"));
-			BeanUtils.copyProperties(userDTO,user,"email");
-//			user.setFirstName(userDTO.getFirstName());
-//			user.setLastName(userDTO.getLastName());
-//			user.setStatus(userDTO.getStatus());
-//			user.setEmail(userDTO.getEmail());
-
-		}else{
-		 user = userConverter.convertToEntity(userDTO);
-	}
-
+		User user = userConverter.convertToEntity(userDTO);
 		user.setRoles(roles);
 		user.setPassword(encodedPassword(123456+""));
 		user.setEnabled(true);
 		user.setUserName(UUID.randomUUID().toString());
-		System.out.println(user.getFirstName()+" "+user.getLastName());
 		User userAdded =userRepo.save(user);
-		System.out.println(userAdded.getFirstName()+" "+userAdded.getLastName());
+		return userConverter.convertToResponse(userAdded);
+	}
+
+	@Override
+	public UserResponse edit(UserDTO userDTO) {
+		User user=userRepo.findById(userDTO.getId())
+				.orElseThrow(() -> new EntityNotFoundException("Product "+userDTO.getId()+" does not exist!"));
+		List<Role> roles = new ArrayList<>();
+		Arrays.stream(userDTO.getRoles()).map(role->roles.add(roleRepo.findByName(role))).collect(Collectors.toList());
+
+		BeanUtils.copyProperties(userDTO,user,"email");
+		user.setRoles(roles);
+		user.setPassword(encodedPassword(123456+""));
+		user.setEnabled(true);
+		user.setUserName(UUID.randomUUID().toString());
+		User userAdded =userRepo.save(user);
 		return userConverter.convertToResponse(userAdded);
 	}
 
@@ -133,7 +143,10 @@ public class UserService implements IUserService {
 		userDTO.setPassword(encodedPassword(userDTO.getPassword()));
 		User user = userConverter.convertToEntity(userDTO);
 		Role role = roleRepo.findByName(ERole.CLIENT.name());
-		user.addRole(role);
+		List<Role> roles = new ArrayList<>();
+		roles.add(role);
+		user.setRoles(roles);
+//		user.getRoles().add(role);
 		user.setStatus(1);
 		user.setUserName(UUID.randomUUID().toString());
 		user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
@@ -240,6 +253,13 @@ public class UserService implements IUserService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 		return userConverter.convertToResponse(userRepo.findAll(pageable));
 	}
+
+	@Override
+	public Integer countByRoleName(String name) {
+		return userRepo.countByRoleName(name);
+	}
+
+
 
 	private void sendMailForgotPassword(User user, String siteURL) {
 		try {

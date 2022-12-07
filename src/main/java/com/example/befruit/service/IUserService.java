@@ -3,13 +3,14 @@ package com.example.befruit.service;
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.User;
+import com.example.befruit.repo.specs.EntitySpecification;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface IUserService {
 	UserResponse add(UserDTO userDTO);
-
+	UserResponse edit(UserDTO userDTO);
 	List<UserDTO> getUsers();
 
 	User getUserByToken(String token);
@@ -33,4 +34,6 @@ public interface IUserService {
 	UserDTO update(UserDTO userDTO);
 
 	Page<UserResponse> getAll(int page, int size);
+Integer countByRoleName(String name);
+Page<UserResponse> filter(EntitySpecification<User> productSpecification,int page, int size);
 }

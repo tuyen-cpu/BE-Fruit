@@ -38,8 +38,8 @@ public class User extends Base<String> implements Serializable {
 	//    @OneToMany(cascade = CascadeType.ALL)
 //    private List<CartItem> cartItems;
 	public void addRole(Role role) {
-		System.out.println("vào add role");
+		System.out.println("Progress add role.");
 		this.roles.add(role);
-		System.out.println("vào add role thnafh công");
+		System.out.println("Added role.");
 	}
 }

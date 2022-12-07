@@ -99,7 +99,6 @@ public class AuthController {
 			String refreshToken;
 			List<String> roles;
 			if (uu == null) {
-				System.out.println("chưa ton tai mai: " + payload.getEmail());
 				UserDTO user = new UserDTO();
 				user.setEmail(payload.getEmail());
 				user.setPassword(password);
@@ -159,7 +158,7 @@ public class AuthController {
 			userService.register(user, urlFrontend, true);
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "Register successful. Please check your mail to verify!", user));
 		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed", "Register failed!", e.getMessage()));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 
 

@@ -29,6 +29,17 @@ public class EntitySpecification<T> implements Specification<T> {
 		for (Filter criteria : list) {
 
 			switch (criteria.getOperator()){
+				case IN:
+					if(criteria.getKey().startsWith("role")){
+						Join<User, Role> join = root.join("roles");
+						predicates.add(builder.like(
+								join.get(splitString(criteria.getKey())), "%"+ criteria.getValue()+"%"));
+					}else{
+						predicates.add(builder.like(
+								root.get(criteria.getKey()), "%"+ criteria.getValue()+"%"));
+					}
+
+					break;
 				case GREATER_THAN:
 					predicates.add(builder.greaterThan(
 							root.get(criteria.getKey()), criteria.getValue().toString()));
@@ -50,15 +61,8 @@ public class EntitySpecification<T> implements Specification<T> {
 							root.get(criteria.getKey()), criteria.getValue()));
 					break;
 				case EQUAL:
-					if(criteria.getKey().startsWith("role")){
-						Join<User, Role> join = root.join("roles");
-						predicates.add(builder.equal(
-								join.get(splitString(criteria.getKey())), criteria.getValue()));
-					}else{
-						predicates.add(builder.equal(
-								root.get(criteria.getKey()), criteria.getValue()));
-					}
-
+					predicates.add(builder.equal(
+							root.get(criteria.getKey()), criteria.getValue()));
 					break;
 
 //                case MATCH:

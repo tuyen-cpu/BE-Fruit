@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -89,13 +90,13 @@ public class UserManagerController {
 			EntitySpecification<User> productSpecifications = new EntitySpecification<User>();
 			request.forEach((k, value) -> {
 				if(convertWithoutUnderStoke(k).equals("page")){
-					System.out.println(k+"_"+value);
 					pagi[0]=Integer.parseInt(value.get(0));
 				}else if(convertWithoutUnderStoke(k).equals("size")){
-					System.out.println(k+"_"+value);
 					pagi[1]=Integer.parseInt(value.get(0));
-				}else{
+				} else if (isNumber(value.get(0))) {
 					productSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
+				} else{
+					productSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
 				}
 			});
 			Page<UserResponse>  userResponses = userService.filter(productSpecifications,pagi[0],pagi[1]);
@@ -105,9 +106,12 @@ public class UserManagerController {
 					.body(new ResponseObject("ok", "Get user successfully!", userResponses));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", "Get failed!", ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 
+	}
+	public static boolean isNumber(String text){
+		return text.chars().allMatch(Character::isDigit);
 	}
 	private String convertWithoutUnderStoke(String str){
 		return str.split("_")[0];

@@ -82,24 +82,22 @@ public class UserManagerController {
 	}
 	@GetMapping("/filter")
 	public ResponseEntity<ResponseObject> user(@RequestParam() MultiValueMap<String, String> request
-//																						 @RequestParam(name = "page", defaultValue = "0") int page,
-//																						 @RequestParam(name = "size", defaultValue = "10") int size
 	) {
 		try {
-			int[] pagi ={0,0};
-			EntitySpecification<User> productSpecifications = new EntitySpecification<User>();
+			int[] paginator ={0,0};
+			EntitySpecification<User> userSpecifications = new EntitySpecification<User>();
 			request.forEach((k, value) -> {
 				if(convertWithoutUnderStoke(k).equals("page")){
-					pagi[0]=Integer.parseInt(value.get(0));
+					paginator[0]=Integer.parseInt(value.get(0));
 				}else if(convertWithoutUnderStoke(k).equals("size")){
-					pagi[1]=Integer.parseInt(value.get(0));
+					paginator[1]=Integer.parseInt(value.get(0));
 				} else if (isNumber(value.get(0))) {
-					productSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
+					userSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
 				} else{
-					productSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
+					userSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
 				}
 			});
-			Page<UserResponse>  userResponses = userService.filter(productSpecifications,pagi[0],pagi[1]);
+			Page<UserResponse>  userResponses = userService.filter(userSpecifications,paginator[0],paginator[1]);
 			System.out.println(userResponses.toString());
 
 			return ResponseEntity.ok()
@@ -108,7 +106,6 @@ public class UserManagerController {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
-
 	}
 	public static boolean isNumber(String text){
 		return text.chars().allMatch(Character::isDigit);

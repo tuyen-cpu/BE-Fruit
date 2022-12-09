@@ -5,6 +5,7 @@ import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Product;
 import com.example.befruit.repo.ProductRepo;
+import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.service.IProductService;
 import com.example.befruit.service.IStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,4 +93,10 @@ public ProductResponse add(ProductRequest productRequest) {
 		throw new RuntimeException("Product failed!");
 	}
 }
+
+	@Override
+	public Page<ProductResponse> filter(EntitySpecification<Product> productSpecification, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return productConverter.convertToResponse(productRepo.findAll(productSpecification,pageable));
+	}
 }

@@ -34,6 +34,6 @@ public interface IUserService {
 	UserDTO update(UserDTO userDTO);
 
 	Page<UserResponse> getAll(int page, int size);
-Integer countByRoleName(String name);
-Page<UserResponse> filter(EntitySpecification<User> productSpecification,int page, int size);
+	Integer countByRoleName(String name);
+	Page<UserResponse> filter(EntitySpecification<User> productSpecification,int page, int size);
 }

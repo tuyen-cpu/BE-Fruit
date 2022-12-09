@@ -3,7 +3,9 @@ package com.example.befruit.controller.admin;
 import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
-import com.example.befruit.entity.ResponseObject;
+import com.example.befruit.dto.response.UserResponse;
+import com.example.befruit.entity.*;
+import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.service.IImageService;
 import com.example.befruit.service.IProductService;
 import com.example.befruit.service.IStorageService;
@@ -15,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,5 +89,37 @@ public class ProductManagerController {
 		}
 
 	}
+	@GetMapping("/filter")
+	public ResponseEntity<ResponseObject> user(@RequestParam() MultiValueMap<String, String> request
+	) {
+		try {
+			int[] paginator ={0,0};
+			EntitySpecification<Product> productSpecifications = new EntitySpecification<Product>();
+			request.forEach((k, value) -> {
+				if(convertWithoutUnderStoke(k).equals("page")){
+					paginator[0]=Integer.parseInt(value.get(0));
+				}else if(convertWithoutUnderStoke(k).equals("size")){
+					paginator[1]=Integer.parseInt(value.get(0));
+				} else if (isNumber(value.get(0))) {
+					productSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
+				} else{
+					productSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
+				}
+			});
+			Page<ProductResponse>  productResponses = productService.filter(productSpecifications,paginator[0],paginator[1]);
 
+
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Filter product successfully!", productResponses));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	public static boolean isNumber(String text){
+		return text.chars().allMatch(Character::isDigit);
+	}
+	private String convertWithoutUnderStoke(String str){
+		return str.split("_")[0];
+	}
 }

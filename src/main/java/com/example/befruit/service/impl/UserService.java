@@ -130,8 +130,10 @@ public class UserService implements IUserService {
 	public void register(UserDTO userDTO, String siteURL, boolean isSendMail) {
 		User userCheck = userRepo.findByEmail(userDTO.getEmail());
 		if (userCheck != null && !userCheck.getEnabled()) {
-			sendVerificationEmail(userConverter.convertToEntity(userDTO), siteURL);
-			return;
+//			sendVerificationEmail(userConverter.convertToEntity(userDTO), siteURL);
+//			return;
+			throw new RuntimeException("Email already exists! Checkout your mail to verify!");
+
 		}
 		if (userCheck != null && userCheck.getEnabled()) {
 			throw new RuntimeException("Email already exists!");
@@ -282,7 +284,7 @@ public class UserService implements IUserService {
 			helper.setSubject(subject);
 
 			content = content.replace("[[name]]", user.getLastName() + " " + user.getFirstName());
-			String verifyURL = siteURL + "/account/reset?code=" + user.getVerificationCode();
+			String verifyURL = siteURL + "/auth/reset?code=" + user.getVerificationCode();
 
 			content = content.replace("[[URL]]", verifyURL);
 
@@ -315,7 +317,7 @@ public class UserService implements IUserService {
 			helper.setSubject(subject);
 
 			content = content.replace("[[name]]", user.getLastName() + " " + user.getFirstName());
-			String verifyURL = siteURL + "/account/verify?code=" + user.getVerificationCode();
+			String verifyURL = siteURL + "/auth/verify?code=" + user.getVerificationCode();
 
 			content = content.replace("[[URL]]", verifyURL);
 

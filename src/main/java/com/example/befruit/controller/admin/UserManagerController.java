@@ -91,9 +91,10 @@ public class UserManagerController {
 					paginator[0]=Integer.parseInt(value.get(0));
 				}else if(convertWithoutUnderStoke(k).equals("size")){
 					paginator[1]=Integer.parseInt(value.get(0));
-				} else if (isNumber(value.get(0))) {
+				} else if (!convertWithoutUnderStoke(k).equals("email")&&isNumber(value.get(0))) {
 					userSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
-				} else{
+				}
+				else{
 					userSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
 				}
 			});

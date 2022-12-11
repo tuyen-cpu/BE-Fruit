@@ -16,6 +16,7 @@ public interface IProductService {
 	ProductResponse getById(Long id);
 	ProductResponse getBySlug(String slug);
 	ProductResponse add(ProductRequest productRequest);
+	ProductResponse edit(ProductRequest productRequest);
 Page<ProductResponse> filter(EntitySpecification<Product> productSpecification, int page, int size);
 
 }

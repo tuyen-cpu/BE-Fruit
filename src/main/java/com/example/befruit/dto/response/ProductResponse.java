@@ -22,6 +22,7 @@ public class ProductResponse {
 	private Integer quantity;
 	private Integer status;
 	private String slug;
+
 	private CategoryResponse category;
 	private ImageDTO image;
 }

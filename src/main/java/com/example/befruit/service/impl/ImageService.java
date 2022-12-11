@@ -43,6 +43,12 @@ public class ImageService implements IImageService {
 
 	@Override
 	public Integer getSizeByProductId(Long productId) {
+	try{
+		Integer dd=imageRepo.getSizeByProductId(productId);
 		return imageRepo.getSizeByProductId(productId);
+	}catch(Exception e){
+		return null;
+	}
+
 	}
 }

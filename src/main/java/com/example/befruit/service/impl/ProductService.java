@@ -4,10 +4,12 @@ import com.example.befruit.converter.ProductConverter;
 import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Product;
+import com.example.befruit.entity.User;
 import com.example.befruit.repo.ProductRepo;
 import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.service.IProductService;
 import com.example.befruit.service.IStorageService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,13 +81,19 @@ if(status==null){
 
 	@Override
 	public ProductResponse getBySlug(String slug) {
-		return productConverter.convertToResponse(productRepo.findBySlug(slug));
+
+			Product product =productRepo.findBySlug(slug);
+		if(product!=null){
+			return productConverter.convertToResponse(product);
+		}
+	return null;
 	}
 
 	@Override
 
 public ProductResponse add(ProductRequest productRequest) {
 	try {
+
 		Product product = productConverter.convertToEntity(productRequest);
 		Product productAdded =productRepo.save(product);
 		return productConverter.convertToResponse(productAdded);
@@ -93,6 +101,20 @@ public ProductResponse add(ProductRequest productRequest) {
 		throw new RuntimeException("Product failed!");
 	}
 }
+	@Override
+	public ProductResponse edit(ProductRequest productRequest) {
+		try{
+			Product product=productRepo.findById(productRequest.getId())
+					.orElseThrow(() -> new EntityNotFoundException("Product "+productRequest.getId()+" does not exist!"));
+			BeanUtils.copyProperties(productRequest,product,"id");
+			product.getCategory().setId(productRequest.getCategory().getId());
+			Product productAdded =productRepo.save(product);
+			return productConverter.convertToResponse(productAdded);
+		} catch (Exception e) {
+			throw new RuntimeException("Product failed!");
+		}
+	}
+
 
 	@Override
 	public Page<ProductResponse> filter(EntitySpecification<Product> productSpecification, int page, int size) {

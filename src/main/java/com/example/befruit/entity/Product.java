@@ -15,10 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "product")
-public class Product implements Serializable {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class Product extends Base<String> implements Serializable {
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	private Long id;
 	private String name;
 	private Long price;
 	private String description;

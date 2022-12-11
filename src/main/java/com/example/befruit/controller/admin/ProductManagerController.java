@@ -63,28 +63,35 @@ public class ProductManagerController {
 
 			ObjectMapper objectMapper = new ObjectMapper();
 			ProductRequest product = objectMapper.readValue(productRequest, ProductRequest.class);
-			if(productService.getBySlug(product.getSlug())!=null){
+
+			if(product.getId()==null && productService.getBySlug(product.getSlug())!=null){
 				throw  new RuntimeException("Slug already exist!");
 			}
-			ProductResponse productResponse = productService.add(product);
+			ProductResponse productResponse;
+		if(product.getId()!=null){
+			productResponse = productService.edit(product);
+		}else{
+			productResponse = productService.add(product);
+		}
+
 			if(file!=null && file.length>0){
 				List<String> listImage = new ArrayList<>();
 				for (MultipartFile multipartFile : file) {
 					String generatedFileName = storageService.storeFile(multipartFile);
 					listImage.add(generatedFileName);
 				}
-				if(imageService.getSizeByProductId(product.getId())+file.length>MAX_NUMBER_IMAGE){
+				if(imageService.getSizeByProductId(product.getId())!=null && imageService.getSizeByProductId(product.getId())+file.length>MAX_NUMBER_IMAGE){
 					throw new RuntimeException("The allowed number of photos has been exceeded (maximum 5 photos)!");
 				}
 				List<ImageDTO> imageDTOs = imageService.add(listImage.stream().map(e -> new ImageDTO(null, e, productResponse.getId())).collect(Collectors.toList()));
-				imageService.add(imageDTOs);
+//				imageService.add(imageDTOs);
 			}
 
-			ProductResponse result = productService.getById(productResponse.getId());
-			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", result));
+//			ProductResponse result = productService.getById(productResponse.getId());
+			return ResponseEntity.ok().body(new ResponseObject("ok", "Get product successful!", null));
 
 		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("faild", e.getMessage(), ""));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 
 		}
 

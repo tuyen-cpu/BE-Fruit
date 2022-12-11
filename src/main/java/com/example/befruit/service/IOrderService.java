@@ -11,4 +11,5 @@ public interface IOrderService {
 
 	OrderResponse getById(Long id);
 	OrderResponse updateStatusShipping(Long id,String status);
+	Page<OrderResponse> getAll(Integer page, Integer size);
 }

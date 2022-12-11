@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,6 +110,12 @@ public class OrderService implements IOrderService {
 					.orElseThrow(() -> new EntityNotFoundException("User "+id+" does not exist!"));
 		order.setShippingStatus(shippingStatus);
 		return orderConverter.convertToResponse(orderRepo.save(order));
+	}
+
+	@Override
+	public Page<OrderResponse> getAll(Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return orderConverter.convertToResponse(orderRepo.findAll(pageable));
 	}
 
 }

@@ -60,7 +60,6 @@ public class UserManagerController {
 	@PutMapping("/edit")
 	public ResponseEntity<ResponseObject> edit(@RequestBody UserDTO userDTO){
 		try{
-			System.out.println(userService.countByRoleName(ERole.ADMIN.getName())+"tuyen");
 			Authentication authentication = SecurityContextHolder.getContext()
 					.getAuthentication();
 			UserDetail currentUserLogin =(UserDetail) authentication.getPrincipal();

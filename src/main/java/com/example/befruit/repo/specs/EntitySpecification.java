@@ -6,8 +6,14 @@ import com.example.befruit.entity.User;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EntitySpecification<T> implements Specification<T> {
 	private final List<Filter> list;
@@ -34,7 +40,19 @@ public class EntitySpecification<T> implements Specification<T> {
 						Join<User, Role> join = root.join("roles");
 						predicates.add(builder.like(
 								join.get(splitString(criteria.getKey())), "%"+ criteria.getValue()+"%"));
-					}else{
+
+					}
+//					else if(criteria.getKey().startsWith("createdDate")){
+//						try {
+//							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//							Date parsedDate = formatter.parse((String) criteria.getValue());
+//							predicates.add(builder.equal(
+//									root.get(criteria.getKey()), builder.literal(parsedDate)));
+//						} catch (ParseException e) {
+//							throw new RuntimeException(e);
+//						}
+//					}
+					else{
 						predicates.add(builder.like(
 								root.get(criteria.getKey()), "%"+ criteria.getValue()+"%"));
 					}
@@ -61,8 +79,16 @@ public class EntitySpecification<T> implements Specification<T> {
 							root.get(criteria.getKey()), criteria.getValue()));
 					break;
 				case EQUAL:
+					if(criteria.getKey().startsWith("shippingStatus")){
+					Join<User, Role> join = root.join("shippingStatus");
+					System.out.println(splitString(criteria.getKey()));
 					predicates.add(builder.equal(
-							root.get(criteria.getKey()), criteria.getValue()));
+							join.get(splitString(criteria.getKey())),  criteria.getValue()));
+				}else{
+						predicates.add(builder.equal(
+								root.get(criteria.getKey()), criteria.getValue()));
+					}
+
 					break;
 
 //                case MATCH:

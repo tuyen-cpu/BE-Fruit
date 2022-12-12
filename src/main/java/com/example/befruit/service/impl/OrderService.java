@@ -11,6 +11,7 @@ import com.example.befruit.repo.AddressRepo;
 import com.example.befruit.repo.OrderDetailRepo;
 import com.example.befruit.repo.OrderRepo;
 import com.example.befruit.repo.UserRepo;
+import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -116,6 +117,20 @@ public class OrderService implements IOrderService {
 	public Page<OrderResponse> getAll(Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 		return orderConverter.convertToResponse(orderRepo.findAll(pageable));
+	}
+
+	@Override
+	public Page<OrderResponse> filter(EntitySpecification<Bill> productSpecification, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		return orderConverter.convertToResponse(orderRepo.findAll(productSpecification,pageable));
+	}
+
+	@Override
+	public OrderResponse updateShippingStatus(Long id, ShippingStatus shippingStatus) {
+		Bill bill = orderRepo.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Order "+id+" does not exist!"));
+		bill.setShippingStatus(shippingStatus);
+		return orderConverter.convertToResponse(orderRepo.save(bill));
 	}
 
 }

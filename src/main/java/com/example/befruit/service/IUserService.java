@@ -4,6 +4,7 @@ import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.UserSpecification;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -35,5 +36,5 @@ public interface IUserService {
 
 	Page<UserResponse> getAll(int page, int size);
 	Integer countByRoleName(String name);
-	Page<UserResponse> filter(EntitySpecification<User> productSpecification,int page, int size);
+	Page<UserResponse> filter(UserSpecification userSpecification, int page, int size);
 }

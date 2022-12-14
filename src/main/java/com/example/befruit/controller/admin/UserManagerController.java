@@ -1,9 +1,11 @@
 package com.example.befruit.controller.admin;
 
 import com.example.befruit.dto.UserDTO;
+import com.example.befruit.dto.filter.FilterUser;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.*;
 import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.UserSpecification;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
 import com.example.befruit.service.impl.RoleService;
@@ -16,6 +18,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,6 +69,10 @@ public class UserManagerController {
 			UserDetail currentUserLogin =(UserDetail) authentication.getPrincipal();
 			User userIsEdited= userService.getUserByEmail(userDTO.getEmail());
 
+			if(userIsEdited.getEmail().equals(currentUserLogin.getEmail())
+					&& !(currentUserLogin.getStatus().intValue()==userDTO.getStatus().intValue())){
+				throw new RuntimeException("Unable to change status by itself!");
+			}
 			if(currentUserLogin.getAuthorities().stream().anyMatch(e -> e.toString().equals("admin"))
 					&&userIsEdited.getEmail().equals(currentUserLogin.getEmail())
 					&&!userDTO.getRoles()[0].equals("admin")
@@ -79,25 +87,40 @@ public class UserManagerController {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), null));
 		}
 	}
-	@GetMapping("/filter")
-	public ResponseEntity<ResponseObject> user(@RequestParam() MultiValueMap<String, String> request
+	@PostMapping("/filter")
+	public ResponseEntity<ResponseObject> filter(@RequestBody FilterUser filterUser
 	) {
 		try {
-			int[] paginator ={0,0};
-			EntitySpecification<User> userSpecifications = new EntitySpecification<User>();
-			request.forEach((k, value) -> {
-				if(convertWithoutUnderStoke(k).equals("page")){
-					paginator[0]=Integer.parseInt(value.get(0));
-				}else if(convertWithoutUnderStoke(k).equals("size")){
-					paginator[1]=Integer.parseInt(value.get(0));
-				} else if (!convertWithoutUnderStoke(k).equals("email")&&isNumber(value.get(0))) {
-					userSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
-				}
-				else{
-					userSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
-				}
-			});
-			Page<UserResponse>  userResponses = userService.filter(userSpecifications,paginator[0],paginator[1]);
+			UserSpecification userSpecifications = new UserSpecification();
+//			this.getFields(filterUser).forEach((field) -> {
+//			 if (field.equals("email")&&isNumber(value.get(0))) {
+//					userSpecifications.add(new Filter(field, QueryOperator.EQUAL ,value.get(0)));
+//				}
+//				else{
+//					userSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
+//				}
+//			});
+			if(filterUser.getCreatedAt()==null||filterUser.getCreatedAt().size()<1){
+							}
+			else if(filterUser.getCreatedAt().get(0)==null){
+				userSpecifications.add(new Filter("createdAt", QueryOperator.IN ,filterUser.getCreatedAt().get(1)));
+			}else if(filterUser.getCreatedAt().get(1)==null){
+				userSpecifications.add(new Filter("createdAt", QueryOperator.IN ,filterUser.getCreatedAt().get(0)));
+			}else if(filterUser.getCreatedAt().get(0)!=null && filterUser.getCreatedAt().get(1)!=null){
+				userSpecifications.add(new Filter("createdAt", QueryOperator.IN ,filterUser.getCreatedAt()));
+			}
+			if(filterUser.getRole()!=null){
+				userSpecifications.add(new Filter("role", QueryOperator.EQUAL ,filterUser.getRole()));
+			}
+			if(filterUser.getStatus()!=null){
+				userSpecifications.add(new Filter("status", QueryOperator.EQUAL ,filterUser.getStatus()));
+			}
+			if(filterUser.getEmail()!=null){
+				userSpecifications.add(new Filter("email", QueryOperator.LIKE ,filterUser.getEmail()));
+			}
+
+
+			Page<UserResponse>  userResponses = userService.filter(userSpecifications,filterUser.getPage(),filterUser.getSize());
 			System.out.println(userResponses.toString());
 
 			return ResponseEntity.ok()
@@ -106,6 +129,14 @@ public class UserManagerController {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
+	}
+	public List<String> getFields(Object o) {
+		List<String> fields= new ArrayList<>();
+		Class<?> clazz = o.getClass();
+		for(Field field : clazz.getDeclaredFields()) {
+			fields.add(field.getName());
+		}
+		return fields;
 	}
 	public static boolean isNumber(String text){
 		return text.chars().allMatch(Character::isDigit);

@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 @MappedSuperclass
@@ -27,26 +28,6 @@ public abstract class Base<U>  implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected long id;
-
-//	@Column(name = "created_by", nullable = false)
-//	protected String createdBy;
-//	@Column(name = "update_by")
-//	protected String updatedBy;
-//
-//	@Temporal(TemporalType.TIMESTAMP)
-//	@Column(name = "created_at", nullable = false)
-//	protected Date createdAt;
-//
-//	@Temporal(TemporalType.TIMESTAMP)
-//	@Column(name = "update_at")
-//	protected Date updatedAt;
-//	@PrePersist
-//	private void onCreate() {
-//
-//		createdAt = new Date();
-//		updatedAt= new Date();
-//	}
-
 
 	@LastModifiedBy
 	@Column(name = "update_by", nullable = false)

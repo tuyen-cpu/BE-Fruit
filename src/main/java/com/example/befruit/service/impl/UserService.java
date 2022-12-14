@@ -9,6 +9,7 @@ import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.repo.UserRepo;
 import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.UserSpecification;
 import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
 import com.example.befruit.service.IUserService;
 import net.bytebuddy.utility.RandomString;
@@ -60,9 +61,9 @@ public class UserService implements IUserService {
 
 
 	@Override
-	public Page<UserResponse> filter(EntitySpecification<User> productSpecification,int page,int size) {
+	public Page<UserResponse> filter(UserSpecification userSpecification, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-		return userConverter.convertToResponse(userRepo.findAll(productSpecification,pageable));
+		return userConverter.convertToResponse(userRepo.findAll(userSpecification,pageable));
 	}
 	@Override
 	public UserResponse add(UserDTO userDTO) {

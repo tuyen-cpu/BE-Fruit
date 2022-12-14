@@ -18,9 +18,10 @@ public class UserDetail implements UserDetails {
 	private Boolean isEnabled;
 	private String firstName;
 	private String lastName;
+	private Integer status;
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public UserDetail(Long id, String username, String email, String password,Boolean isEnabled, String firstName,String lastName,
+	public UserDetail(Long id, String username, String email, String password,Boolean isEnabled, String firstName,String lastName,Integer status,
 										Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
@@ -30,6 +31,7 @@ public class UserDetail implements UserDetails {
 		this.isEnabled =isEnabled;
 		this.firstName=firstName;
 		this.lastName=lastName;
+		this.status=status;
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class UserDetail implements UserDetails {
 	public static UserDetail build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-		return new UserDetail(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(),user.getEnabled(),user.getFirstName(),user.getLastName(), authorities);
+		return new UserDetail(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(),user.getEnabled(),user.getFirstName(),user.getLastName(),user.getStatus(), authorities);
 	}
 
 	@Override
@@ -66,6 +68,9 @@ public class UserDetail implements UserDetails {
 
 	public String getLastName() {
 		return lastName;
+	}
+	public Integer getStatus() {
+		return status;
 	}
 
 	@Override

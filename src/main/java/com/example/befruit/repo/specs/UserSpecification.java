@@ -8,17 +8,17 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-public class EntitySpecification<T> implements Specification<T> {
+
+public class UserSpecification implements Specification<User> {
 	private final List<Filter> list;
 
-	public EntitySpecification() {
+	public UserSpecification() {
 		this.list = new ArrayList<>();
 	}
 
@@ -27,41 +27,35 @@ public class EntitySpecification<T> implements Specification<T> {
 	}
 
 	@Override
-	public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+	public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
 
 		List<Predicate> predicates = new ArrayList<>();
 
 
 		for (Filter criteria : list) {
-
 			switch (criteria.getOperator()){
 				case IN:
-					if(criteria.getKey().startsWith("role")){
-						Join<User, Role> join = root.join("roles");
-						predicates.add(builder.like(
-								join.get(splitString(criteria.getKey())), "%"+ criteria.getValue()+"%"));
+					if(criteria.getValue() instanceof ArrayList){
+						Date start = (Date) ((ArrayList<?>) criteria.getValue()).get(0);
+						Date end = (Date) ((ArrayList<?>) criteria.getValue()).get(1);
+						predicates.add(builder.between(root.get(criteria.getKey()),start,end));
+					}else if(criteria.getValue() instanceof Date){
 
+						Date start = (Date) criteria.getValue();
+						predicates.add(builder.equal(root.get(criteria.getKey()), builder.literal(start)));
 					}
-					else if(criteria.getKey().startsWith("createdDate")){
-						try {
-							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-							Date parsedDate = formatter.parse((String) criteria.getValue());
-							predicates.add(builder.equal(
-									root.get(criteria.getKey()), builder.literal(parsedDate)));
-						} catch (ParseException e) {
-							throw new RuntimeException(e);
-						}
-					}
-					else{
-						predicates.add(builder.like(
-								root.get(criteria.getKey()), "%"+ criteria.getValue()+"%"));
-					}
-
 					break;
+
+				case LIKE:
+					predicates.add(builder.like(
+							root.get(criteria.getKey()), "%"+criteria.getValue().toString()+"%"));
+					break;
+
 				case GREATER_THAN:
 					predicates.add(builder.greaterThan(
 							root.get(criteria.getKey()), criteria.getValue().toString()));
 					break;
+
 				case LESS_THAN:
 					predicates.add(builder.lessThan(
 							root.get(criteria.getKey()), criteria.getValue().toString()));
@@ -79,14 +73,14 @@ public class EntitySpecification<T> implements Specification<T> {
 							root.get(criteria.getKey()), criteria.getValue()));
 					break;
 				case EQUAL:
-					if(criteria.getKey().startsWith("shippingStatus")){
-					Join<User, Role> join = root.join("shippingStatus");
-					System.out.println(splitString(criteria.getKey()));
-					predicates.add(builder.equal(
-							join.get(splitString(criteria.getKey())),  criteria.getValue()));
-				}else{
+					if(criteria.getKey().equals("role")){
+						Join<User, Role> join = root.join("roles");
 						predicates.add(builder.equal(
-								root.get(criteria.getKey()), criteria.getValue()));
+								join.get("name"), criteria.getValue().toString()));
+					}
+					else{
+						predicates.add(builder.equal(
+								root.get(criteria.getKey()), criteria.getValue().toString()));
 					}
 
 					break;

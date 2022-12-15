@@ -3,7 +3,6 @@ package com.example.befruit.service.impl;
 import com.example.befruit.converter.AddressConverter;
 import com.example.befruit.converter.OrderConverter;
 import com.example.befruit.converter.OrderDetailConverter;
-import com.example.befruit.dto.AddressDTO;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.entity.*;
@@ -11,17 +10,24 @@ import com.example.befruit.repo.AddressRepo;
 import com.example.befruit.repo.OrderDetailRepo;
 import com.example.befruit.repo.OrderRepo;
 import com.example.befruit.repo.UserRepo;
-import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.OrderSpecification;
+import com.example.befruit.repo.specs.ProductSpecification;
 import com.example.befruit.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,9 +47,17 @@ public class OrderService implements IOrderService {
 	private OrderDetailConverter orderDetailConverter;
 	@Autowired
 	private OrderConverter orderConverter;
-
+	@Value("${server.frontend}")
+	private String urlFrontend;
 	@Autowired
 	private ShippingStatusService shippingStatusService;
+	@Autowired
+	private JavaMailSender mailSender;
+	private final String contentUnVerified = "FRUIT SHOP has received your order and is processing it. You will receive a follow-up notification when your order is ready to be shipped.";
+	private final String contentVerified = "FRUIT SHOP has processed your order and is forwarding it to shipping. You will receive a follow-up notification when your order is ready to be shipped.";
+	private final String contentDelivering = "FRUIT SHOP has handed over your order to the carrier. You will receive a follow-up notification when your order is ready to be shipped.";
+	private final String contentDelivered = "Your order has been successfully delivered.";
+	private final String contentCancel = "Your order has been cancelled.";
 
 	@Transactional
 	@Override
@@ -53,7 +67,7 @@ public class OrderService implements IOrderService {
 			ShippingStatus shippingStatus = shippingStatusService.getByName(EShippingStatus.UNVERIFIED.getName());
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
 			User user = userRepo.findById(orderRequest.getUserId())
-					.orElseThrow(() -> new EntityNotFoundException("User "+orderRequest.getUserId()+" does not exist!"));
+					.orElseThrow(() -> new EntityNotFoundException("User " + orderRequest.getUserId() + " does not exist!"));
 			Payment p = orderRequest.getPayment();
 			Bill order = new Bill();
 
@@ -101,14 +115,14 @@ public class OrderService implements IOrderService {
 	@Override
 	public OrderResponse getById(Long id) {
 		return orderConverter.convertToResponse(orderRepo.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("User "+id+" does not exist!")));
+				.orElseThrow(() -> new EntityNotFoundException("User " + id + " does not exist!")));
 	}
 
 	@Override
 	public OrderResponse updateStatusShipping(Long id, String status) {
 		ShippingStatus shippingStatus = shippingStatusService.getByName(status);
 		Bill order = orderRepo.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("User "+id+" does not exist!"));
+				.orElseThrow(() -> new EntityNotFoundException("User " + id + " does not exist!"));
 		order.setShippingStatus(shippingStatus);
 		return orderConverter.convertToResponse(orderRepo.save(order));
 	}
@@ -120,17 +134,69 @@ public class OrderService implements IOrderService {
 	}
 
 	@Override
-	public Page<OrderResponse> filter(EntitySpecification<Bill> productSpecification, int page, int size) {
+	public Page<OrderResponse> filter(OrderSpecification orderSpecification, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-		return orderConverter.convertToResponse(orderRepo.findAll(productSpecification,pageable));
+		return orderConverter.convertToResponse(orderRepo.findAll(orderSpecification, pageable));
 	}
 
 	@Override
 	public OrderResponse updateShippingStatus(Long id, ShippingStatus shippingStatus) {
 		Bill bill = orderRepo.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("Order "+id+" does not exist!"));
+				.orElseThrow(() -> new EntityNotFoundException("Order " + id + " does not exist!"));
 		bill.setShippingStatus(shippingStatus);
-		return orderConverter.convertToResponse(orderRepo.save(bill));
+		Bill billSaved =orderRepo.save(bill);
+		this.sendEmailUpdateStatus(billSaved,urlFrontend);
+		return orderConverter.convertToResponse(billSaved);
 	}
+
+	private void sendEmailUpdateStatus(Bill bill, String siteURL) {
+		try {
+			String toAddress = bill.getUser().getEmail();
+			String fromAddress = "tuyencpu@gmail.com";
+			String senderName = "FRUIT SHOP";
+			String subject = "FRUIT SHOP informs you of the status of your order #" + bill.getId();
+			String content = "Dear [[name]],<br>" +
+					"[[contentStatus]]"
+					+ "<br><br>You can click the link below to to check your order status:<br>"
+					+ "<h3><a href=\"[[URL]]\" target=\"_self\">" +
+					"" +
+					"<img src=\"https://ci3.googleusercontent.com/proxy/9jgAlmsBdeW4k7SN4PYFou5sXZJDwnQpE7L9_GrSxd5p43TiK3Li0WMJzOQe5MceZB1LO4lMeQJZmrwOL93w66V3ag62T0K_S3QylDt6fmkwodqj=s0-d-e1-ft#https://img.alicdn.com/tfs/TB1qEWqJbr1gK0jSZR0XXbP8XXa-300-50.jpg\" style=\"max-width:300px\" border=\"0\" class=\"CToWUd\" data-bit=\"iit\"></a></h3>"
+					+ "<br>Address: "+bill.getAddress()+"<br>"
+					+ "<br>Thank you,<br>"
+					+ "FRUIT SHOP.";
+
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message);
+
+			helper.setFrom(fromAddress, senderName);
+			helper.setTo(toAddress);
+			helper.setSubject(subject);
+
+			content = content.replace("[[name]]", bill.getUser().getLastName() + " " + bill.getUser().getFirstName());
+			String verifyURL = siteURL + "/account/order/" + bill.getId();
+
+			content = content.replace("[[URL]]", verifyURL);
+
+			if (bill.getShippingStatus().getName().equals(EShippingStatus.UNVERIFIED.getName())) {
+				content = content.replace("[[contentStatus]]", contentUnVerified);
+			} else if (bill.getShippingStatus().getName().equals(EShippingStatus.VERIFIED.getName())) {
+				content = content.replace("[[contentStatus]]", contentVerified);
+			} else if (bill.getShippingStatus().getName().equals(EShippingStatus.DELIVERING.getName())) {
+				content = content.replace("[[contentStatus]]", contentDelivering);
+			} else if (bill.getShippingStatus().getName().equals(EShippingStatus.DELIVERED.getName())) {
+				content = content.replace("[[contentStatus]]", contentDelivered);
+			} else if (bill.getShippingStatus().getName().equals(EShippingStatus.CANCELED.getName())) {
+				content = content.replace("[[contentStatus]]", contentCancel);
+			}
+
+
+			helper.setText(content, true);
+			mailSender.send(message);
+		} catch (UnsupportedEncodingException | MessagingException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 
 }

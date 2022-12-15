@@ -1,21 +1,18 @@
 package com.example.befruit.controller.admin;
 
-import com.example.befruit.dto.request.OrderRequest;
+import com.example.befruit.dto.filter.OrderFilter;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.dto.response.ProductResponse;
-import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.*;
-import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.OrderSpecification;
+import com.example.befruit.repo.specs.ProductSpecification;
 import com.example.befruit.service.IOrderService;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/admin/order")
@@ -49,25 +46,30 @@ public class OrderManagerController {
 				.body(new ResponseObject("ok", e.getMessage(), ""));
 	}
 }
-	@GetMapping("/filter")
-	public ResponseEntity<ResponseObject> filter(@RequestParam() MultiValueMap<String, String> request
-	) {
+	@PostMapping("/filter")
+	public ResponseEntity<ResponseObject> filter(@RequestBody OrderFilter orderFilter
+																							 ) {
 		try {
-			int[] paginator ={0,0};
-			EntitySpecification<Bill> orderSpecifications = new EntitySpecification<>();
-			request.forEach((k, value) -> {
-				if(convertWithoutUnderStoke(k).equals("page")){
-					paginator[0]=Integer.parseInt(value.get(0));
-				}else if(convertWithoutUnderStoke(k).equals("size")){
-					paginator[1]=Integer.parseInt(value.get(0));
-				}
-				else if (!convertWithoutUnderStoke(k).equals("address")&&isNumber(value.get(0))) {
-					orderSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
-				} else{
-					orderSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
-				}
-			});
-			Page<OrderResponse>  orderResponsePage = orderService.filter(orderSpecifications,paginator[0],paginator[1]);
+			OrderSpecification orderSpecification = new OrderSpecification();
+			if(orderFilter.getCreatedDate()==null||orderFilter.getCreatedDate().size()<1){
+			}
+			else if(orderFilter.getCreatedDate().get(0)==null){
+				orderSpecification.add(new Filter("createdDate", QueryOperator.IN ,orderFilter.getCreatedDate().get(1)));
+			}else if(orderFilter.getCreatedDate().get(1)==null){
+				orderSpecification.add(new Filter("createdDate", QueryOperator.IN ,orderFilter.getCreatedDate().get(0)));
+			}else if(orderFilter.getCreatedDate().get(0)!=null && orderFilter.getCreatedDate().get(1)!=null){
+				orderSpecification.add(new Filter("createdDate", QueryOperator.IN ,orderFilter.getCreatedDate()));
+			}
+			if(orderFilter.getAddress()!=null){
+				orderSpecification.add(new Filter("address", QueryOperator.LIKE ,orderFilter.getAddress()));
+			}
+			if(orderFilter.getPayment()!=null){
+				orderSpecification.add(new Filter("payment", QueryOperator.EQUAL ,orderFilter.getPayment()));
+
+			}
+
+
+			Page<OrderResponse>  orderResponsePage = orderService.filter(orderSpecification,orderFilter.getPage(),orderFilter.getSize());
 
 
 			return ResponseEntity.ok()

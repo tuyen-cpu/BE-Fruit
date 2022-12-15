@@ -1,11 +1,13 @@
 package com.example.befruit.controller.admin;
 
 import com.example.befruit.dto.ImageDTO;
+import com.example.befruit.dto.filter.FilterProduct;
 import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.*;
-import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.ProductSpecification;
+import com.example.befruit.repo.specs.UserSpecification;
 import com.example.befruit.service.IImageService;
 import com.example.befruit.service.IProductService;
 import com.example.befruit.service.IStorageService;
@@ -96,24 +98,30 @@ public class ProductManagerController {
 		}
 
 	}
-	@GetMapping("/filter")
-	public ResponseEntity<ResponseObject> user(@RequestParam() MultiValueMap<String, String> request
-	) {
+	@PostMapping("/filter")
+	public ResponseEntity<ResponseObject> filter(@RequestBody FilterProduct filterProduct) {
 		try {
-			int[] paginator ={0,0};
-			EntitySpecification<Product> productSpecifications = new EntitySpecification<Product>();
-			request.forEach((k, value) -> {
-				if(convertWithoutUnderStoke(k).equals("page")){
-					paginator[0]=Integer.parseInt(value.get(0));
-				}else if(convertWithoutUnderStoke(k).equals("size")){
-					paginator[1]=Integer.parseInt(value.get(0));
-				} else if (isNumber(value.get(0))) {
-					productSpecifications.add(new Filter(k, QueryOperator.EQUAL ,value.get(0)));
-				} else{
-					productSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
-				}
-			});
-			Page<ProductResponse>  productResponses = productService.filter(productSpecifications,paginator[0],paginator[1]);
+			ProductSpecification productSpecifications = new ProductSpecification();
+			if(filterProduct.getCreatedAt()==null||filterProduct.getCreatedAt().size()<1){
+			}
+			else if(filterProduct.getCreatedAt().get(0)==null){
+				productSpecifications.add(new Filter("createdAt", QueryOperator.IN ,filterProduct.getCreatedAt().get(1)));
+			}else if(filterProduct.getCreatedAt().get(1)==null){
+				productSpecifications.add(new Filter("createdAt", QueryOperator.IN ,filterProduct.getCreatedAt().get(0)));
+			}else if(filterProduct.getCreatedAt().get(0)!=null && filterProduct.getCreatedAt().get(1)!=null){
+				productSpecifications.add(new Filter("createdAt", QueryOperator.IN ,filterProduct.getCreatedAt()));
+			}
+			if(filterProduct.getName()!=null){
+				productSpecifications.add(new Filter("name", QueryOperator.LIKE ,filterProduct.getName()));
+			}
+			if(filterProduct.getStatus()!=null){
+				productSpecifications.add(new Filter("status", QueryOperator.EQUAL ,filterProduct.getStatus()));
+			}
+			if(filterProduct.getCategoryId()!=null){
+				productSpecifications.add(new Filter("category", QueryOperator.EQUAL ,filterProduct.getCategoryId()));
+			}
+
+			Page<ProductResponse>  productResponses = productService.filter(productSpecifications,filterProduct.getPage(),filterProduct.getSize());
 
 
 			return ResponseEntity.ok()

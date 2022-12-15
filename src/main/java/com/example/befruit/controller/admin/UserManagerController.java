@@ -2,9 +2,9 @@ package com.example.befruit.controller.admin;
 
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.filter.FilterUser;
+import com.example.befruit.dto.request.ChangePasswordRequest;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.*;
-import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.repo.specs.UserSpecification;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
@@ -12,10 +12,11 @@ import com.example.befruit.service.impl.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Field;
@@ -32,6 +33,8 @@ public class UserManagerController {
 	private IUserService userService;
 	@Autowired
 	private RoleService roleService;
+	@Autowired
+	AuthenticationManager authenticationManager;
 	@GetMapping("/all")
 	public ResponseEntity<ResponseObject> user( @RequestParam(name = "page", defaultValue = "0") int page,
 																							@RequestParam(name = "size", defaultValue = "10") int size) {
@@ -87,19 +90,32 @@ public class UserManagerController {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), null));
 		}
 	}
+	@PostMapping("/change-password")
+	public ResponseEntity<ResponseObject> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+		try {
+			Authentication authentication = authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(changePasswordRequest.getEmail(), changePasswordRequest.getPassword()));
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			UserDetail userDetail = (UserDetail) authentication.getPrincipal();
+			if(userDetail==null){
+				return ResponseEntity.badRequest()
+						.body(new ResponseObject("failed", "Invalid password!", ""));
+			}
+			userService.changePassword(changePasswordRequest.getEmail(),changePasswordRequest.getNewPassword());
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Changed password successfully!", ""));
+		} catch (BadCredentialsException e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("failed", "Invalid password!", ""));
+		}
+
+
+	}
 	@PostMapping("/filter")
 	public ResponseEntity<ResponseObject> filter(@RequestBody FilterUser filterUser
 	) {
 		try {
 			UserSpecification userSpecifications = new UserSpecification();
-//			this.getFields(filterUser).forEach((field) -> {
-//			 if (field.equals("email")&&isNumber(value.get(0))) {
-//					userSpecifications.add(new Filter(field, QueryOperator.EQUAL ,value.get(0)));
-//				}
-//				else{
-//					userSpecifications.add(new Filter(k, QueryOperator.IN ,value.get(0)));
-//				}
-//			});
 			if(filterUser.getCreatedAt()==null||filterUser.getCreatedAt().size()<1){
 							}
 			else if(filterUser.getCreatedAt().get(0)==null){
@@ -119,9 +135,7 @@ public class UserManagerController {
 				userSpecifications.add(new Filter("email", QueryOperator.LIKE ,filterUser.getEmail()));
 			}
 
-
 			Page<UserResponse>  userResponses = userService.filter(userSpecifications,filterUser.getPage(),filterUser.getSize());
-			System.out.println(userResponses.toString());
 
 			return ResponseEntity.ok()
 					.body(new ResponseObject("ok", "Get user successfully!", userResponses));

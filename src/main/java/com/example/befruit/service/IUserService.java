@@ -3,7 +3,6 @@ package com.example.befruit.service;
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.User;
-import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.repo.specs.UserSpecification;
 import org.springframework.data.domain.Page;
 

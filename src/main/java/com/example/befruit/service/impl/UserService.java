@@ -8,7 +8,6 @@ import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
 import com.example.befruit.repo.UserRepo;
-import com.example.befruit.repo.specs.EntitySpecification;
 import com.example.befruit.repo.specs.UserSpecification;
 import com.example.befruit.sercurity.jwt.exception.TokenRefreshException;
 import com.example.befruit.service.IUserService;

@@ -3,8 +3,7 @@ package com.example.befruit.service;
 import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Product;
-import com.example.befruit.entity.User;
-import com.example.befruit.repo.specs.EntitySpecification;
+import com.example.befruit.repo.specs.ProductSpecification;
 import org.springframework.data.domain.Page;
 
 public interface IProductService {
@@ -17,6 +16,6 @@ public interface IProductService {
 	ProductResponse getBySlug(String slug);
 	ProductResponse add(ProductRequest productRequest);
 	ProductResponse edit(ProductRequest productRequest);
-Page<ProductResponse> filter(EntitySpecification<Product> productSpecification, int page, int size);
+Page<ProductResponse> filter(ProductSpecification productSpecification, int page, int size);
 
 }

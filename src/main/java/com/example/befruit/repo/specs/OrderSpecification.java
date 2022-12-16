@@ -68,14 +68,18 @@ public class OrderSpecification implements Specification<Bill> {
 				case EQUAL:
 					if(criteria.getKey().equals("payment")){
 						Join<Bill, Payment> join = root.join("payment");
-						predicates.add(builder.equal(
-								join.get("status"), ((Payment)criteria.getValue()).getStatus()));
-						predicates.add(builder.equal(
-								join.get("paymentMethod"), ((Payment)criteria.getValue()).getPaymentMethod()));
+						if(((Payment)criteria.getValue()).getStatus()!=null){
+							predicates.add(builder.equal(
+									join.get("status"), ((Payment)criteria.getValue()).getStatus()));
+						}
+						if(((Payment)criteria.getValue()).getPaymentMethod()!=null){
+							predicates.add(builder.equal(
+									join.get("paymentMethod"), ((Payment)criteria.getValue()).getPaymentMethod()));
+						}
 					}else if(criteria.getKey().equals("shippingStatusId")){
 						Join<Bill, ShippingStatus> join = root.join("shippingStatus");
 						predicates.add(builder.equal(
-								join.get("id"), ((Payment)criteria.getValue()).getStatus()));
+								join.get("id"), criteria.getValue()));
 					}
 					else{
 						predicates.add(builder.equal(

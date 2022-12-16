@@ -4,6 +4,7 @@ import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.request.ChangePasswordRequest;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.ResponseObject;
+import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
@@ -18,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -82,6 +85,17 @@ public class UserController {
 		try{
 			return ResponseEntity.ok()
 					.body(new ResponseObject("failed", "Invalid password!", userService.countByRoleName(name)));
+		}catch (Exception e){
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/role")
+	public ResponseEntity<ResponseObject> getRoles (@RequestParam("userId") Long userId){
+		try{
+			List<Role> roles=roleService.getRoleByUserId(userId);
+			return ResponseEntity.ok()
+					.body(new ResponseObject("failed", "Get role ok!", roles));
 		}catch (Exception e){
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));

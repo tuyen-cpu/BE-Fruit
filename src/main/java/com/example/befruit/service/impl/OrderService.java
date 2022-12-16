@@ -73,6 +73,7 @@ public class OrderService implements IOrderService {
 
 			order.setStatus(EStatus.ACTIVE.getName());
 			order.setShippingStatus(shippingStatus);
+			order.setShippingCost(orderRequest.getShippingCost());
 			order.setUser(user);
 			order.setAddress(orderRequest.getAddress());
 			order.setDescription(orderRequest.getDescription());

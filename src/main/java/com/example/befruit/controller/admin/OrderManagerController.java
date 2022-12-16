@@ -2,16 +2,12 @@ package com.example.befruit.controller.admin;
 
 import com.example.befruit.dto.filter.OrderFilter;
 import com.example.befruit.dto.response.OrderResponse;
-import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.*;
 import com.example.befruit.repo.specs.OrderSpecification;
-import com.example.befruit.repo.specs.ProductSpecification;
 import com.example.befruit.service.IOrderService;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -65,9 +61,10 @@ public class OrderManagerController {
 			}
 			if(orderFilter.getPayment()!=null){
 				orderSpecification.add(new Filter("payment", QueryOperator.EQUAL ,orderFilter.getPayment()));
-
 			}
-
+			if(orderFilter.getShippingStatusId()!=null){
+				orderSpecification.add(new Filter("shippingStatusId", QueryOperator.EQUAL ,orderFilter.getShippingStatusId()));
+			}
 
 			Page<OrderResponse>  orderResponsePage = orderService.filter(orderSpecification,orderFilter.getPage(),orderFilter.getSize());
 

@@ -91,6 +91,7 @@ public class WebSecurityConfig {
 		corsConfiguration.setExposedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization",
 				"Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
 		String[] admins = {ERole.ADMIN.name(), ERole.MANAGER.name()};
 		http.csrf().disable().cors().configurationSource(request -> corsConfiguration).and()
 				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()

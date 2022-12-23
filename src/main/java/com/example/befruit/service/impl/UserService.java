@@ -33,10 +33,7 @@ import javax.persistence.EntityNotFoundException;
 import java.beans.FeatureDescriptor;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,9 +58,20 @@ public class UserService implements IUserService {
 
 	@Override
 	public Page<UserResponse> filter(UserSpecification userSpecification, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 		return userConverter.convertToResponse(userRepo.findAll(userSpecification,pageable));
 	}
+
+	@Override
+	public Integer totalOrdersInDay(Date date) {
+		return userRepo.totalOrdersInDay(date);
+	}
+
+	@Override
+	public Integer totalOrders() {
+		return userRepo.totalOrders();
+	}
+
 	@Override
 	public UserResponse add(UserDTO userDTO) {
 
@@ -115,14 +123,11 @@ public class UserService implements IUserService {
 		return user;
 	}
 
-	@Transactional
+
 	@Override
-	public UserDTO getUserById(long id) {
-		User u = userRepo.findById(id).get();
-		UserDTO user = new UserDTO();
-		user.setId(u.getId());
-		user.setEmail(u.getEmail());
-		return user;
+	public UserResponse getById(Long id) {
+		User u = userRepo.findById(id).orElseThrow(()->new EntityNotFoundException("User " + id + " does not exist!"));
+		return userConverter.convertToResponse(u);
 	}
 
 
@@ -182,7 +187,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	@Transactional
+//	@Transactional
 	public String getTokenByUserId(Long id) {
 		User user = userRepo.findById(id).get();
 		user.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
@@ -213,7 +218,7 @@ public class UserService implements IUserService {
 
 	}
 
-	@Transactional
+//	@Transactional
 	@Override
 	public void resetPassword(String verificationCode, String password) {
 		User user = userRepo.findByVerificationCode(verificationCode);
@@ -222,7 +227,7 @@ public class UserService implements IUserService {
 		user.setVerificationCode(null);
 		userRepo.save(user);
 	}
-	@Transactional
+//	@Transactional
 	@Override
 	public void changePassword(String email,String password) {
 		User user = userRepo.findByEmail(email);
@@ -252,7 +257,7 @@ public class UserService implements IUserService {
 
 	@Override
 	public Page<UserResponse> getAll(int page, int size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 		return userConverter.convertToResponse(userRepo.findAll(pageable));
 	}
 

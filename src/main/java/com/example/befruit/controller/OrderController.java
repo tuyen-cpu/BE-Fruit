@@ -62,7 +62,7 @@ public class OrderController {
   @PutMapping("/update-shipping-status")
   public ResponseEntity<ResponseObject> updateStatusShipping(@RequestBody OrderRequest orderRequest){
     try{
-      OrderResponse orderResponses = orderService.updateStatusShipping(orderRequest.getId(), EShippingStatus.CANCELED.getName());
+      OrderResponse orderResponses = orderService.updateStatusShipping(orderRequest.getId(), EShippingStatus.CANCELING.getName());
       return ResponseEntity.ok().body(new ResponseObject("ok","Get order successful!",orderResponses));
 
     }catch (Exception e){

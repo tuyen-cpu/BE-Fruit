@@ -21,6 +21,8 @@ public class OrderRequest implements Serializable {
 	private String description;
 	private String address;
 	private Long userId;
+	private String phone;
+	private String fullName;
 	private List<OrderDetailRequest> orderDetails = new ArrayList<>();
 	private Payment payment;
 }

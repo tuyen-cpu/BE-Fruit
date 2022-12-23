@@ -5,14 +5,13 @@ import com.example.befruit.converter.OrderConverter;
 import com.example.befruit.converter.OrderDetailConverter;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
+import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.*;
-import com.example.befruit.repo.AddressRepo;
-import com.example.befruit.repo.OrderDetailRepo;
-import com.example.befruit.repo.OrderRepo;
-import com.example.befruit.repo.UserRepo;
+import com.example.befruit.repo.*;
 import com.example.befruit.repo.specs.OrderSpecification;
 import com.example.befruit.repo.specs.ProductSpecification;
 import com.example.befruit.service.IOrderService;
+import com.example.befruit.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -28,6 +27,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +44,8 @@ public class OrderService implements IOrderService {
 	@Autowired
 	private UserRepo userRepo;
 	@Autowired
+	private IProductService productService;
+	@Autowired
 	private OrderDetailConverter orderDetailConverter;
 	@Autowired
 	private OrderConverter orderConverter;
@@ -57,6 +59,7 @@ public class OrderService implements IOrderService {
 	private final String contentVerified = "FRUIT SHOP has processed your order and is forwarding it to shipping. You will receive a follow-up notification when your order is ready to be shipped.";
 	private final String contentDelivering = "FRUIT SHOP has handed over your order to the carrier. You will receive a follow-up notification when your order is ready to be shipped.";
 	private final String contentDelivered = "Your order has been successfully delivered.";
+	private final String contentCanceling = "Your order cancellation request is being processed. The store staff will call you to confirm the request as soon as possible.";
 	private final String contentCancel = "Your order has been cancelled.";
 
 	@Transactional
@@ -68,9 +71,16 @@ public class OrderService implements IOrderService {
 			shippingStatus.setName(EShippingStatus.UNVERIFIED.getName());
 			User user = userRepo.findById(orderRequest.getUserId())
 					.orElseThrow(() -> new EntityNotFoundException("User " + orderRequest.getUserId() + " does not exist!"));
+			if (orderRequest.getOrderDetails().stream()
+							.anyMatch(item -> productService.getById(item.getProductId()).getQuantity() <= 0
+							|| productService.getById(item.getProductId()).getQuantity() < item.getQuantity()
+							|| productService.getById(item.getProductId()).getStatus()==0)) {
+				throw new RuntimeException("Quantity is not enough");
+			}
 			Payment p = orderRequest.getPayment();
 			Bill order = new Bill();
-
+			order.setPhone(orderRequest.getPhone());
+			order.setFullName(orderRequest.getFullName());
 			order.setStatus(EStatus.ACTIVE.getName());
 			order.setShippingStatus(shippingStatus);
 			order.setShippingCost(orderRequest.getShippingCost());
@@ -84,12 +94,23 @@ public class OrderService implements IOrderService {
 			for (OrderDetail orderDetail : orderDetails) {
 				total += (orderDetail.getPrice() - orderDetail.getPrice() * orderDetail.getDiscount() / 100) * orderDetail.getQuantity();
 			}
-			order.setTotal(total);
+			if(total>250000){
+				order.setTotal(total);
+			}else{
+				order.setTotal(total+30000);
+			}
+
 			order.setOrderDetails(orderDetails);
 			p.setBill(order);
 			order.setPayment(p);
 			orderRepo.save(order);
 
+			List<Product> products =orderDetails.stream().map(e->{
+				Product pro= productService.getProductById(e.getProduct().getId());
+				pro.setQuantity(pro.getQuantity()-e.getQuantity());
+			return pro;
+			}).collect(Collectors.toList());
+			productService.add(products);
 			return true;
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
@@ -100,12 +121,10 @@ public class OrderService implements IOrderService {
 	@Override
 	public Page<OrderResponse> getByUserId(Long userId, Integer page, Integer size) {
 		try {
-			Pageable pageable = PageRequest.of(page, size);
+			Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
 			Page<Bill> orderResponses = orderRepo.findAllByUserIdAndStatus(userId, EStatus.ACTIVE.getName(), pageable);
 
 			return orderConverter.convertToResponse(orderResponses);
-
-
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -123,7 +142,7 @@ public class OrderService implements IOrderService {
 	public OrderResponse updateStatusShipping(Long id, String status) {
 		ShippingStatus shippingStatus = shippingStatusService.getByName(status);
 		Bill order = orderRepo.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("User " + id + " does not exist!"));
+				.orElseThrow(() -> new EntityNotFoundException("Order " + id + " does not exist!"));
 		order.setShippingStatus(shippingStatus);
 		return orderConverter.convertToResponse(orderRepo.save(order));
 	}
@@ -145,10 +164,32 @@ public class OrderService implements IOrderService {
 		Bill bill = orderRepo.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Order " + id + " does not exist!"));
 		bill.setShippingStatus(shippingStatus);
-		Bill billSaved =orderRepo.save(bill);
-		this.sendEmailUpdateStatus(billSaved,urlFrontend);
+		Bill billSaved = orderRepo.save(bill);
+		this.sendEmailUpdateStatus(billSaved, urlFrontend);
 		return orderConverter.convertToResponse(billSaved);
 	}
+
+	@Override
+	public Integer totalOrders() {
+		return orderRepo.totalOrders();
+	}
+
+	@Override
+	public Integer totalOrdersInDay(Date date) {
+		return orderRepo.totalOrdersInDay(date);
+	}
+
+	@Override
+	public Integer getRevenue() {
+		return orderRepo.totalRevenue();
+	}
+
+	@Override
+	public Integer getRevenueMonth(Integer i) {
+		return orderRepo.totalRevenueMonth(i);
+	}
+
+
 
 	private void sendEmailUpdateStatus(Bill bill, String siteURL) {
 		try {
@@ -162,7 +203,7 @@ public class OrderService implements IOrderService {
 					+ "<h3><a href=\"[[URL]]\" target=\"_self\">" +
 					"" +
 					"<img src=\"https://ci3.googleusercontent.com/proxy/9jgAlmsBdeW4k7SN4PYFou5sXZJDwnQpE7L9_GrSxd5p43TiK3Li0WMJzOQe5MceZB1LO4lMeQJZmrwOL93w66V3ag62T0K_S3QylDt6fmkwodqj=s0-d-e1-ft#https://img.alicdn.com/tfs/TB1qEWqJbr1gK0jSZR0XXbP8XXa-300-50.jpg\" style=\"max-width:300px\" border=\"0\" class=\"CToWUd\" data-bit=\"iit\"></a></h3>"
-					+ "<br>Address: "+bill.getAddress()+"<br>"
+					+ "<br>Address: " + bill.getAddress() + "<br>"
 					+ "<br>Thank you,<br>"
 					+ "FRUIT SHOP.";
 
@@ -178,6 +219,7 @@ public class OrderService implements IOrderService {
 
 			content = content.replace("[[URL]]", verifyURL);
 
+
 			if (bill.getShippingStatus().getName().equals(EShippingStatus.UNVERIFIED.getName())) {
 				content = content.replace("[[contentStatus]]", contentUnVerified);
 			} else if (bill.getShippingStatus().getName().equals(EShippingStatus.VERIFIED.getName())) {
@@ -188,7 +230,8 @@ public class OrderService implements IOrderService {
 				content = content.replace("[[contentStatus]]", contentDelivered);
 			} else if (bill.getShippingStatus().getName().equals(EShippingStatus.CANCELED.getName())) {
 				content = content.replace("[[contentStatus]]", contentCancel);
-			}
+			}else if (bill.getShippingStatus().getName().equals(EShippingStatus.CANCELING.getName())) {
+				content = content.replace("[[contentStatus]]", contentCanceling);}
 
 
 			helper.setText(content, true);

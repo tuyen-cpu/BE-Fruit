@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -40,6 +41,18 @@ public class UserManagerController {
 																							@RequestParam(name = "size", defaultValue = "10") int size) {
 		try {
 			Page<UserResponse> user = userService.getAll(page,size);
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get user successfully!", user));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", "Get failed!", ""));
+		}
+
+	}
+	@GetMapping("/{id}")
+	public ResponseEntity<ResponseObject> getById(@PathVariable("id") Long id) {
+		try {
+			UserResponse user = userService.getById(id);
 			return ResponseEntity.ok()
 					.body(new ResponseObject("ok", "Get user successfully!", user));
 		} catch (Exception e) {
@@ -81,6 +94,10 @@ public class UserManagerController {
 					&&!userDTO.getRoles()[0].equals("admin")
 					&&userService.countByRoleName(ERole.ADMIN.getName())<=1){
 				throw new RuntimeException("Can't delete the only admin account!");
+			}
+			if(currentUserLogin.getAuthorities().stream().noneMatch(e -> e.toString().equals("admin")
+					)&&userIsEdited.getRoles().get(0).getName().equals("admin")){
+				throw new RuntimeException("You don't have permission to edit admin!");
 			}
 
 			UserResponse userResponse = userService.edit(userDTO);
@@ -144,6 +161,31 @@ public class UserManagerController {
 					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
+	@GetMapping("/total")
+	public ResponseEntity<ResponseObject> getTotal(){
+
+		try {
+			Integer total =userService.totalOrders();
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/total-in-day")
+	public ResponseEntity<ResponseObject> getTotalInDay(){
+
+		try {
+			Integer total = userService.totalOrdersInDay(new Date());
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
+		}
+	}
+
 	public List<String> getFields(Object o) {
 		List<String> fields= new ArrayList<>();
 		Class<?> clazz = o.getClass();

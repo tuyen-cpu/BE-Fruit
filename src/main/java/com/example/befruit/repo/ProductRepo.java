@@ -1,5 +1,7 @@
 package com.example.befruit.repo;
 
+import com.example.befruit.dto.BestSellingProduct;
+import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +29,7 @@ public interface ProductRepo extends JpaRepository<Product, Long>, JpaSpecificat
 	Page<Product> findAllByNameOrCategoryName(String q, Pageable pageable);
 	Product findBySlug(String slug);
 
+
+//	@Query("SELECT new com.example.befruit.dto.BestSellingProduct(o.product.name, sum(o.quantity))  FROM OrderDetail o  group by o.product.name, sum(o.quantity)")
+	List<BestSellingProduct> getBestSelling(Pageable pageable);
 }

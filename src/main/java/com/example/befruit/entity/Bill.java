@@ -24,6 +24,8 @@ public class Bill extends Base<String> implements Serializable {
 	private Long total;
 	private String description;
 	private String address;
+	private String phone;
+	private String fullName;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable = false)
 	private Date createdDate;

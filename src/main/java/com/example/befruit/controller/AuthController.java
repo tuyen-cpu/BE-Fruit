@@ -77,7 +77,7 @@ public class AuthController {
 		} catch (LockedException e) {
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
 		} catch (DisabledException e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed","Account is not verified!", ""));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(), ""));
 
 		}
 
@@ -92,7 +92,6 @@ public class AuthController {
 			GoogleIdTokenVerifier.Builder verifier = new GoogleIdTokenVerifier.Builder(transport, jacksonFactory);
 			final GoogleIdToken googleIdToken = GoogleIdToken.parse(verifier.getJsonFactory(), tokenDTO.getValue());
 			final GoogleIdToken.Payload payload = googleIdToken.getPayload();
-
 			User uu = userService.getUserByEmail(payload.getEmail());
 			UserDetail userDetail;
 			String jwt;
@@ -102,7 +101,8 @@ public class AuthController {
 				UserDTO user = new UserDTO();
 				user.setEmail(payload.getEmail());
 				user.setPassword(password);
-				user.setFirstName("Random");
+				user.setFirstName((String) payload.get("family_name"));
+				user.setLastName((String) payload.get("given_name"));
 				userService.register(user, urlFrontend, false);
 				userDetail = UserDetail.build(userService.getUserByEmail(user.getEmail()));
 
@@ -122,14 +122,14 @@ public class AuthController {
 
 	}
 
-	@PostMapping("/logout")
-	public ResponseEntity<?> logoutUser() {
-		ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-		return ResponseEntity.ok()
-				.header(HttpHeaders.SET_COOKIE, cookie.toString())
-
-				.body(new ResponseObject("ok", "Logout successful!", ""));
-	}
+//	@PostMapping("/logout")
+//	public ResponseEntity<?> logoutUser() {
+//		ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+//		return ResponseEntity.ok()
+//				.header(HttpHeaders.SET_COOKIE, cookie.toString())
+//
+//				.body(new ResponseObject("ok", "Logout successful!", ""));
+//	}
 
 	@PostMapping("/refreshtoken")
 	public ResponseEntity<ResponseObject> refreshToken(@RequestBody TokenRefreshRequest request) {
@@ -140,7 +140,6 @@ public class AuthController {
 			try {
 				User user = userService.getUserByToken(refreshToken);
 				String token = jwtUtils.generateTokenFromUsername(user.getEmail());
-				System.out.println("tạo lại refresh token xong" + token);
 				return ResponseEntity.ok().body(new ResponseObject("ok", "Refresh token successful", new TokenRefreshResponse(token, refreshToken)));
 
 			} catch (Exception e) {

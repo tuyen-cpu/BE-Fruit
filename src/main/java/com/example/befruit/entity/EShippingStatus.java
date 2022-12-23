@@ -5,7 +5,9 @@ public enum EShippingStatus {
 	UNVERIFIED("UNVERIFIED"),
 	DELIVERING("DELIVERING"),
 	DELIVERED("DELIVERED"),
-	CANCELED("CANCELED");
+	CANCELED("CANCELED"),
+	CANCELING("CANCELING");
+
 	private final String name;
 
 	EShippingStatus(String s) {

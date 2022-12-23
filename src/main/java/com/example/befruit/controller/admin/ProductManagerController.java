@@ -1,5 +1,6 @@
 package com.example.befruit.controller.admin;
 
+import com.example.befruit.dto.BestSellingProduct;
 import com.example.befruit.dto.ImageDTO;
 import com.example.befruit.dto.filter.FilterProduct;
 import com.example.befruit.dto.request.ProductRequest;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,6 +131,18 @@ public class ProductManagerController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/best-selling")
+	public ResponseEntity<ResponseObject> getBestSelling(){
+
+		try {
+			List<BestSellingProduct> productResponses = productService.getBestSelling();
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", productResponses));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
 		}
 	}
 	public static boolean isNumber(String text){

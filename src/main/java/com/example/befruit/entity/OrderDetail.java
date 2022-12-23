@@ -18,10 +18,10 @@ public class OrderDetail implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long price;
+
 	private Integer quantity;
 	private Integer discount;
-
+	private Long price;
 	@ManyToOne(targetEntity = Product.class)
 	@JoinColumn(name = "product_id", nullable = false)
 	@JsonIgnore

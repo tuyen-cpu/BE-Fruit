@@ -18,5 +18,7 @@ public class OrderResponse {
 	private Date createdDate;
 	private ShippingStatus shippingStatus;
 	private String address;
+	private String fullName;
+	private String phone;
 	private Payment payment;
 }

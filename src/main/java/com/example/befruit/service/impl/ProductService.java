@@ -1,6 +1,7 @@
 package com.example.befruit.service.impl;
 
 import com.example.befruit.converter.ProductConverter;
+import com.example.befruit.dto.BestSellingProduct;
 import com.example.befruit.dto.request.ProductRequest;
 import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.Product;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 public class ProductService implements IProductService {
@@ -78,6 +80,16 @@ public class ProductService implements IProductService {
 		}
 
 	}
+	@Override
+	public Product getProductById(Long id) {
+		try {
+			return productRepo.findById(id)
+					.orElseThrow(() -> new EntityNotFoundException("Product " + id + " does not exist!"));
+		} catch (Exception e) {
+			throw new RuntimeException("Product " + id + " is not found!");
+		}
+
+	}
 
 	@Override
 	public ProductResponse getBySlug(String slug) {
@@ -98,10 +110,18 @@ public class ProductService implements IProductService {
 			Product productAdded = productRepo.save(product);
 			return productConverter.convertToResponse(productAdded);
 		} catch (Exception e) {
-			throw new RuntimeException("Product failed!");
+			throw new RuntimeException("Add product failed!");
 		}
 	}
+	@Override
 
+	public List<Product> add(List<Product> products) {
+		try {
+			return productRepo.saveAll(products);
+		} catch (Exception e) {
+			throw new RuntimeException("Save product failed!");
+		}
+	}
 	@Override
 	public ProductResponse edit(ProductRequest productRequest) {
 		try {
@@ -121,5 +141,11 @@ public class ProductService implements IProductService {
 	public Page<ProductResponse> filter(ProductSpecification productSpecification, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 		return productConverter.convertToResponse(productRepo.findAll(productSpecification, pageable));
+	}
+
+	@Override
+	public List<BestSellingProduct> getBestSelling() {
+		Pageable pageable = PageRequest.of(10,0);
+		return productRepo.getBestSelling(pageable);
 	}
 }

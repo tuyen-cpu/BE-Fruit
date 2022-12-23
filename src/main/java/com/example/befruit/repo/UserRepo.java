@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 //@Repository
@@ -29,4 +30,9 @@ public interface UserRepo extends JpaRepository<User, Long> , JpaSpecificationEx
 	User findByToken(String token);
 	@Query("select count(u) from User u join u.roles r where r.name=?1")
 	Integer countByRoleName(String name);
+
+	@Query("select count(b) from User b join b.roles r where r.name='client'")
+	Integer totalOrders();
+	@Query("select count(b) from User b join b.roles r where r.name='client' and cast(b.createdAt as date) = cast(?1 as date)")
+	Integer totalOrdersInDay(Date date);
 }

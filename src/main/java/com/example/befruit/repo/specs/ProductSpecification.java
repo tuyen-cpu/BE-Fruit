@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,7 @@ public class ProductSpecification implements Specification<Product> {
 					}else if(criteria.getValue() instanceof Date){
 
 						Date start = (Date) criteria.getValue();
-						predicates.add(builder.equal(root.get(criteria.getKey()), builder.literal(start)));
+						predicates.add(builder.equal(root.get(criteria.getKey()).as(LocalDate.class), builder.literal(start).as(LocalDate.class)));
 					}
 					break;
 

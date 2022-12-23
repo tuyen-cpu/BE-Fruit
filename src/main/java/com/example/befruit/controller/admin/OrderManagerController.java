@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
+import java.util.Date;
+
 @RestController
 @RequestMapping("/api/admin/order")
 public class OrderManagerController {
@@ -74,6 +77,66 @@ public class OrderManagerController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/total")
+	public ResponseEntity<ResponseObject> getTotal(){
+
+		try {
+			Integer total = orderService.totalOrders();
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/total-in-day")
+	public ResponseEntity<ResponseObject> getTotalInDay(){
+
+		try {
+			Integer total = orderService.totalOrdersInDay(new Date());
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/revenue")
+	public ResponseEntity<ResponseObject> getRevenue(){
+
+		try {
+			Integer total = orderService.getRevenue();
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/revenue-last-month")
+	public ResponseEntity<ResponseObject> getRevenueLastMonth(){
+
+		try {
+			Integer total = orderService.getRevenueMonth(Calendar.getInstance().get(Calendar.MONTH));
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/revenue-current-month")
+	public ResponseEntity<ResponseObject> getRevenueCurrentMonth(){
+
+		try {
+			Integer total = orderService.getRevenueMonth(Calendar.getInstance().get(Calendar.MONTH)+1);
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get total orders successfully!", total));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("ok", e.getMessage(), ""));
 		}
 	}
 	public static boolean isNumber(String text){

@@ -6,6 +6,7 @@ import com.example.befruit.entity.User;
 import com.example.befruit.repo.specs.UserSpecification;
 import org.springframework.data.domain.Page;
 
+import java.util.Date;
 import java.util.List;
 
 public interface IUserService {
@@ -15,8 +16,8 @@ public interface IUserService {
 
 	User getUserByToken(String token);
 
-	UserDTO getUserById(long id);
-
+//	UserDTO getUserById(long id);
+UserResponse getById(Long id);
 	String getTokenByUserId(Long id);
 
 	void register(UserDTO userDTO, String siteURL, boolean isSendMail);
@@ -36,4 +37,8 @@ public interface IUserService {
 	Page<UserResponse> getAll(int page, int size);
 	Integer countByRoleName(String name);
 	Page<UserResponse> filter(UserSpecification userSpecification, int page, int size);
+
+	Integer totalOrdersInDay(Date date);
+
+	Integer totalOrders();
 }

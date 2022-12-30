@@ -27,7 +27,7 @@ public abstract class Base<U>  implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	protected long id;
+	protected Long id;
 
 	@LastModifiedBy
 	@Column(name = "update_by", nullable = false)

@@ -2,6 +2,7 @@ package com.example.befruit.controller;
 
 import com.example.befruit.dto.TokenDTO;
 import com.example.befruit.dto.UserDTO;
+import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.ResponseObject;
 import com.example.befruit.entity.User;
 import com.example.befruit.sercurity.jwt.JwtUtils;
@@ -12,6 +13,7 @@ import com.example.befruit.sercurity.jwt.payload.response.JwtResponse;
 import com.example.befruit.sercurity.jwt.payload.response.TokenRefreshResponse;
 import com.example.befruit.sercurity.service.UserDetail;
 import com.example.befruit.service.IUserService;
+import com.example.befruit.service.impl.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -27,9 +29,11 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
@@ -49,7 +53,9 @@ public class AuthController {
 	private String googleClientId;
 	@Value(value = "${google.secret}")
 	private String password;
+	public static final int MAX_FAILED_ATTEMPTS = 5;
 
+	private static final long LOCK_TIME_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 	@PostMapping("/login")
 	public ResponseEntity<ResponseObject> login(@RequestBody LoginRequest loginRequest) {
 		try {
@@ -67,17 +73,30 @@ public class AuthController {
 			List<String> roles = userDetail.getAuthorities().stream()
 					.map(GrantedAuthority::getAuthority)
 					.collect(Collectors.toList());
-
+			userService.resetFailedAttempts(userDetail.getEmail());
 			return ResponseEntity.ok()
 					.body(new ResponseObject("ok", "Login successful!",
 							new JwtResponse(jwt, refreshToken, userDetail.getId(), userDetail.getUsername(), userDetail.getEmail(),userDetail.getFirstName(),userDetail.getLastName(), roles)));
 
 		}  catch (BadCredentialsException e) {
+			User user = userService.getUserByEmail(loginRequest.getEmail());
+			if (user != null) {
+				if (user.getEnabled() && Objects.equals(user.getStatus(), EStatus.ACTIVE.getName())) {
+					if (user.getFailedAttempt() ==null||user.getFailedAttempt() < MAX_FAILED_ATTEMPTS) {
+						userService.increaseFailedAttempts(user);
+					} else {
+						userService.lock(user);
+						return ResponseEntity.badRequest().body(new ResponseObject("failed", "Your account has been locked due to 5 failed attempts."
+								+ " It will be unlocked after 24 hours.", ""));
+					}
+				}
+
+			}
 			return ResponseEntity.badRequest().body(new ResponseObject("failed", "Email or password invalid!", ""));
 		} catch (LockedException e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage(), ""));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", e.getMessage()+"1", ""));
 		} catch (DisabledException e) {
-			return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(), ""));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage()+"2", ""));
 
 		}
 
@@ -169,7 +188,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "Successful verification!", "Xác minh email thành công!"));
 
 		} else {
-			return ResponseEntity.badRequest().body(new ResponseObject("", "Verification failed!", "Xác minh email thất bại!"));
+			return ResponseEntity.badRequest().body(new ResponseObject("failed", "Verification failed!", "Xác minh email thất bại!"));
 
 		}
 	}

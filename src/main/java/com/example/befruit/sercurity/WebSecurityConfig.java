@@ -100,12 +100,12 @@ public class WebSecurityConfig {
 				.exceptionHandling().accessDeniedHandler(accessDeniedHandler())
 				.and()
 				.authorizeRequests()
-				.antMatchers("/api/auth/**").permitAll()
-				.antMatchers("/api/product/**").permitAll()
-				.antMatchers("/api/cart/add").authenticated()
-				.antMatchers("/api/order/**").authenticated()
-				.antMatchers("/api/admin/**").hasAnyAuthority(ERole.ADMIN.getName(),ERole.MANAGER.getName())
-//				.antMatchers("/api/**").permitAll()
+//				.antMatchers("/api/auth/**").permitAll()
+//				.antMatchers("/api/product/**").permitAll()
+//				.antMatchers("/api/cart/add").authenticated()
+//				.antMatchers("/api/order/**").authenticated()
+//				.antMatchers("/api/admin/**").hasAnyAuthority(ERole.ADMIN.getName(),ERole.MANAGER.getName())
+				.antMatchers("/live/**").permitAll()
 //				.anyRequest().authenticated()
 				.and();
 

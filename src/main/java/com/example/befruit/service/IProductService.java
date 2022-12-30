@@ -24,5 +24,5 @@ public interface IProductService {
 	ProductResponse edit(ProductRequest productRequest);
 Page<ProductResponse> filter(ProductSpecification productSpecification, int page, int size);
 
-	List<BestSellingProduct> getBestSelling();
+	Page<BestSellingProduct> getBestSellingInMonth(Integer month);
 }

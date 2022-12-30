@@ -41,4 +41,9 @@ UserResponse getById(Long id);
 	Integer totalOrdersInDay(Date date);
 
 	Integer totalOrders();
+
+	void increaseFailedAttempts(User user);
+	void resetFailedAttempts(String email);
+	void lock(User user);
+	Boolean unlockWhenTimeExpired(User user);
 }

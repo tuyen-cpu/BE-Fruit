@@ -1,5 +1,6 @@
 package com.example.befruit.service;
 
+import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.entity.Bill;
@@ -9,6 +10,7 @@ import com.example.befruit.repo.specs.ProductSpecification;
 import org.springframework.data.domain.Page;
 
 import java.util.Date;
+import java.util.List;
 
 public interface IOrderService {
 	Boolean addOrder(OrderRequest orderRequest);
@@ -26,4 +28,5 @@ public interface IOrderService {
 
 
 	Integer getRevenueMonth(Integer i);
+	 List<ShippingStatusStatistical> getStatisticalShippingStatus();
 }

@@ -1,5 +1,6 @@
 package com.example.befruit.controller.admin;
 
+import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.dto.filter.OrderFilter;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.entity.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/order")
@@ -28,7 +30,7 @@ public class OrderManagerController {
 					.body(new ResponseObject("ok", "Update orders successfully!", orderResult));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
 
@@ -42,7 +44,7 @@ public class OrderManagerController {
 				.body(new ResponseObject("ok", "Get orders successfully!", orderResponses));
 	} catch (Exception e) {
 		return ResponseEntity.badRequest()
-				.body(new ResponseObject("ok", e.getMessage(), ""));
+				.body(new ResponseObject("failed", e.getMessage(), ""));
 	}
 }
 	@PostMapping("/filter")
@@ -88,7 +90,7 @@ public class OrderManagerController {
 					.body(new ResponseObject("ok", "Get total orders successfully!", total));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
 	@GetMapping("/total-in-day")
@@ -100,7 +102,7 @@ public class OrderManagerController {
 					.body(new ResponseObject("ok", "Get total orders successfully!", total));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
 	@GetMapping("/revenue")
@@ -112,7 +114,7 @@ public class OrderManagerController {
 					.body(new ResponseObject("ok", "Get total orders successfully!", total));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
 	@GetMapping("/revenue-last-month")
@@ -124,7 +126,7 @@ public class OrderManagerController {
 					.body(new ResponseObject("ok", "Get total orders successfully!", total));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
 	@GetMapping("/revenue-current-month")
@@ -136,7 +138,19 @@ public class OrderManagerController {
 					.body(new ResponseObject("ok", "Get total orders successfully!", total));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", e.getMessage(), ""));
+					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/statistical-shipping-status")
+	public ResponseEntity<ResponseObject> getStatisticalShippingStatus(){
+
+		try {
+			List<ShippingStatusStatistical> list = orderService.getStatisticalShippingStatus();
+			return ResponseEntity.ok()
+					.body(new ResponseObject("ok", "Get Statistical Shipping Status successfully!", list));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new ResponseObject("failed", e.getMessage(), ""));
 		}
 	}
 	public static boolean isNumber(String text){

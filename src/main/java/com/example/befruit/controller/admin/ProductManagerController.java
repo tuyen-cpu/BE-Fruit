@@ -134,12 +134,12 @@ public class ProductManagerController {
 		}
 	}
 	@GetMapping("/best-selling")
-	public ResponseEntity<ResponseObject> getBestSelling(){
+	public ResponseEntity<ResponseObject> getBestSellingCurrentMonth(){
 
 		try {
-			List<BestSellingProduct> productResponses = productService.getBestSelling();
+			Page<BestSellingProduct> productResponses = productService.getBestSellingInMonth(Calendar.getInstance().get(Calendar.MONTH)+1);
 			return ResponseEntity.ok()
-					.body(new ResponseObject("ok", "Get total orders successfully!", productResponses));
+					.body(new ResponseObject("ok", "Get best-selling product successfully!", productResponses));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("ok", e.getMessage(), ""));

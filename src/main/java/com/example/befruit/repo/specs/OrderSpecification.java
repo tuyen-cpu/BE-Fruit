@@ -82,6 +82,11 @@ public class OrderSpecification implements Specification<Bill> {
 						predicates.add(builder.equal(
 								join.get("id"), criteria.getValue()));
 					}
+					else if(criteria.getKey().equals("userId")){
+						Join<Bill, User> join = root.join("user");
+						predicates.add(builder.equal(
+								join.get("id"), criteria.getValue()));
+					}
 					else{
 						predicates.add(builder.equal(
 								root.get(criteria.getKey()), criteria.getValue().toString()));

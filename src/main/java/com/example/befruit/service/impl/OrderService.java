@@ -3,6 +3,7 @@ package com.example.befruit.service.impl;
 import com.example.befruit.converter.AddressConverter;
 import com.example.befruit.converter.OrderConverter;
 import com.example.befruit.converter.OrderDetailConverter;
+import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.dto.response.ProductResponse;
@@ -189,6 +190,10 @@ public class OrderService implements IOrderService {
 		return orderRepo.totalRevenueMonth(i);
 	}
 
+	@Override
+	public List<ShippingStatusStatistical> getStatisticalShippingStatus() {
+		return orderRepo.statisticalShippingStatus();
+	}
 
 
 	private void sendEmailUpdateStatus(Bill bill, String siteURL) {
@@ -241,6 +246,5 @@ public class OrderService implements IOrderService {
 		}
 
 	}
-
 
 }

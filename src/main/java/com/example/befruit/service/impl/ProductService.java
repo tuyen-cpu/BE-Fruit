@@ -144,8 +144,8 @@ public class ProductService implements IProductService {
 	}
 
 	@Override
-	public List<BestSellingProduct> getBestSelling() {
-		Pageable pageable = PageRequest.of(10,0);
-		return productRepo.getBestSelling(pageable);
+	public Page<BestSellingProduct> getBestSellingInMonth(Integer month) {
+		Pageable pageable = PageRequest.of(0,8);
+		return productRepo.getBestSellingInMonth(month,pageable);
 	}
 }

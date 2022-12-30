@@ -30,6 +30,6 @@ public interface ProductRepo extends JpaRepository<Product, Long>, JpaSpecificat
 	Product findBySlug(String slug);
 
 
-//	@Query("SELECT new com.example.befruit.dto.BestSellingProduct(o.product.name, sum(o.quantity))  FROM OrderDetail o  group by o.product.name, sum(o.quantity)")
-	List<BestSellingProduct> getBestSelling(Pageable pageable);
+	@Query("SELECT new com.example.befruit.dto.BestSellingProduct(o.product.id,o.product.name,o.product.price,o.product.status, sum(o.quantity))  FROM Bill b join b.orderDetails o join o.product where month(b.createdAt)=?1 group by o.product.id,o.product.name,o.product.price,o.product.status")
+	Page<BestSellingProduct> getBestSellingInMonth(Integer month,Pageable pageable);
 }

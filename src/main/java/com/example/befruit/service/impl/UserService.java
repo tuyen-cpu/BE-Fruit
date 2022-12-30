@@ -4,6 +4,7 @@ import com.example.befruit.converter.UserConverter;
 import com.example.befruit.dto.UserDTO;
 import com.example.befruit.dto.response.UserResponse;
 import com.example.befruit.entity.ERole;
+import com.example.befruit.entity.EStatus;
 import com.example.befruit.entity.Role;
 import com.example.befruit.entity.User;
 import com.example.befruit.repo.RoleRepo;
@@ -55,7 +56,9 @@ public class UserService implements IUserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	public static final int MAX_FAILED_ATTEMPTS = 5;
 
+	private static final long LOCK_TIME_DURATION =  60 * 15 * 1000; // 1 minutes
 	@Override
 	public Page<UserResponse> filter(UserSpecification userSpecification, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
@@ -71,6 +74,8 @@ public class UserService implements IUserService {
 	public Integer totalOrders() {
 		return userRepo.totalOrders();
 	}
+
+
 
 	@Override
 	public UserResponse add(UserDTO userDTO) {
@@ -337,6 +342,7 @@ public class UserService implements IUserService {
 
 	}
 
+
 	public static void myCopyProperties(Object src, Object target) {
 		BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
 	}
@@ -346,5 +352,50 @@ public class UserService implements IUserService {
 				.map(FeatureDescriptor::getName)
 				.filter(propertyName -> wrappedSource.getPropertyValue(propertyName) == null)
 				.toArray(String[]::new);
+	}
+
+
+	public void increaseFailedAttempts(User user) {
+		if(user.getFailedAttempt()==null||user.getFailedAttempt()==0){
+			user.setFailedAttempt(1);
+		}else{
+		user.setFailedAttempt(user.getFailedAttempt() + 1);
+		}
+			userRepo.save(user);
+	}
+
+	public void resetFailedAttempts(String email) {
+		User u =getUserByEmail(email);
+		if(u.getFailedAttempt()>0){
+			u.setFailedAttempt(0);
+			userRepo.save(u);
+		}
+
+	}
+
+	public void lock(User u) {
+		u.setStatus(EStatus.INACTIVE.getName());
+		u.setLockTime(new Date());
+		userRepo.save(u);
+	}
+
+	public Boolean unlockWhenTimeExpired(User u) {
+		Long lockTimeInMillis = null;
+		if(u.getLockTime()!=null){
+			lockTimeInMillis = u.getLockTime().getTime();
+		}
+		
+		Long currentTimeInMillis = System.currentTimeMillis();
+
+		if (lockTimeInMillis!=null && lockTimeInMillis + LOCK_TIME_DURATION < currentTimeInMillis) {
+			u.setStatus(EStatus.ACTIVE.getName());
+			u.setLockTime(null);
+			u.setFailedAttempt(0);
+			userRepo.save(u);
+
+			return true;
+		}
+
+		return false;
 	}
 }

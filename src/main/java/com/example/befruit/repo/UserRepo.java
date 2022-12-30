@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
@@ -35,4 +36,6 @@ public interface UserRepo extends JpaRepository<User, Long> , JpaSpecificationEx
 	Integer totalOrders();
 	@Query("select count(b) from User b join b.roles r where r.name='client' and cast(b.createdAt as date) = cast(?1 as date)")
 	Integer totalOrdersInDay(Date date);
+
+
 }

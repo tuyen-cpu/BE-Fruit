@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -25,6 +26,10 @@ public class User extends Base<String> implements Serializable {
 	@Column(name = "verification_code", length = 64)
 	private String verificationCode;
 	private Boolean enabled;
+	@Column(name = "failed_attempt")
+	private Integer failedAttempt;
+	@Column(name = "lock_time")
+	private Date lockTime;
 	private String token;
 	@Column(name = "expiry_date")
 	private Instant expiryDate;

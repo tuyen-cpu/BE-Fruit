@@ -1,5 +1,6 @@
 package com.example.befruit.repo;
 
+import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.entity.Bill;
 import com.example.befruit.entity.Product;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface OrderRepo extends JpaRepository<Bill, Long> , JpaSpecificationExecutor<Bill> {
@@ -27,4 +29,6 @@ public interface OrderRepo extends JpaRepository<Bill, Long> , JpaSpecificationE
 	Integer totalRevenue();
 	@Query("select sum(b.total) from Bill b where month(b.createdAt)=?1")
 	Integer totalRevenueMonth(Integer month);
+	@Query("SELECT new com.example.befruit.dto.ShippingStatusStatistical(s.name,count(b))  FROM Bill b join b.shippingStatus s group by s.name")
+	List<ShippingStatusStatistical> statisticalShippingStatus();
 }

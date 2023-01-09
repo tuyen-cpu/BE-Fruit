@@ -6,11 +6,9 @@ import com.example.befruit.converter.OrderDetailConverter;
 import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
-import com.example.befruit.dto.response.ProductResponse;
 import com.example.befruit.entity.*;
 import com.example.befruit.repo.*;
 import com.example.befruit.repo.specs.OrderSpecification;
-import com.example.befruit.repo.specs.ProductSpecification;
 import com.example.befruit.service.IOrderService;
 import com.example.befruit.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +77,7 @@ public class OrderService implements IOrderService {
 				throw new RuntimeException("Quantity is not enough");
 			}
 			Payment p = orderRequest.getPayment();
-			Bill order = new Bill();
+			Order order = new Order();
 			order.setPhone(orderRequest.getPhone());
 			order.setFullName(orderRequest.getFullName());
 			order.setStatus(EStatus.ACTIVE.getName());
@@ -123,7 +121,7 @@ public class OrderService implements IOrderService {
 	public Page<OrderResponse> getByUserId(Long userId, Integer page, Integer size) {
 		try {
 			Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-			Page<Bill> orderResponses = orderRepo.findAllByUserIdAndStatus(userId, EStatus.ACTIVE.getName(), pageable);
+			Page<Order> orderResponses = orderRepo.findAllByUserIdAndStatus(userId, EStatus.ACTIVE.getName(), pageable);
 
 			return orderConverter.convertToResponse(orderResponses);
 		} catch (Exception e) {
@@ -142,7 +140,7 @@ public class OrderService implements IOrderService {
 	@Override
 	public OrderResponse updateStatusShipping(Long id, String status) {
 		ShippingStatus shippingStatus = shippingStatusService.getByName(status);
-		Bill order = orderRepo.findById(id)
+		Order order = orderRepo.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Order " + id + " does not exist!"));
 		order.setShippingStatus(shippingStatus);
 		return orderConverter.convertToResponse(orderRepo.save(order));
@@ -162,10 +160,10 @@ public class OrderService implements IOrderService {
 
 	@Override
 	public OrderResponse updateShippingStatus(Long id, ShippingStatus shippingStatus) {
-		Bill bill = orderRepo.findById(id)
+		Order bill = orderRepo.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Order " + id + " does not exist!"));
 		bill.setShippingStatus(shippingStatus);
-		Bill billSaved = orderRepo.save(bill);
+		Order billSaved = orderRepo.save(bill);
 		this.sendEmailUpdateStatus(billSaved, urlFrontend);
 		return orderConverter.convertToResponse(billSaved);
 	}
@@ -196,7 +194,7 @@ public class OrderService implements IOrderService {
 	}
 
 
-	private void sendEmailUpdateStatus(Bill bill, String siteURL) {
+	private void sendEmailUpdateStatus(Order bill, String siteURL) {
 		try {
 			String toAddress = bill.getUser().getEmail();
 			String fromAddress = "tuyencpu@gmail.com";

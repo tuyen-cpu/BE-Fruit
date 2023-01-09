@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface OrderDetailRepo extends JpaRepository<OrderDetail, Long> {
-	@Query("select o from OrderDetail o where o.bill.id=:billId")
-	List<OrderDetail> findAllByBillId(@Param("billId") Long id);
+	@Query("select o from OrderDetail o where o.bill.id=:billId and o.bill.user.id=:userId")
+	List<OrderDetail> findAllByBillIdAndUserId(@Param("billId") Long id,@Param("userId") Long userId);
+	List<OrderDetail> findAllByBillId( Long billId);
 }

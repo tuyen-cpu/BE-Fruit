@@ -84,13 +84,17 @@ public class UserService implements IUserService {
 			throw new RuntimeException("Email already exists!");
 		}
 		List<Role> roles = new ArrayList<>();
-		Arrays.stream(userDTO.getRoles()).map(role->roles.add(roleRepo.findByName(role))).collect(Collectors.toList());
+		Arrays.stream(userDTO.getRoles()).forEach(role->roles.add(roleRepo.findByName(role)));
 		User user = userConverter.convertToEntity(userDTO);
 		user.setRoles(roles);
 		user.setPassword(encodedPassword(123456+""));
-		user.setEnabled(true);
+		user.setEnabled(false);
 		user.setUserName(UUID.randomUUID().toString());
+		String randomCode = RandomString.make(64);
+		user.setVerificationCode(randomCode);
+		sendVerificationEmail(user, "http://localhost:4200");
 		User userAdded =userRepo.save(user);
+
 		return userConverter.convertToResponse(userAdded);
 	}
 
@@ -99,7 +103,7 @@ public class UserService implements IUserService {
 		User user=userRepo.findById(userDTO.getId())
 				.orElseThrow(() -> new EntityNotFoundException("Product "+userDTO.getId()+" does not exist!"));
 		List<Role> roles = new ArrayList<>();
-		Arrays.stream(userDTO.getRoles()).map(role->roles.add(roleRepo.findByName(role))).collect(Collectors.toList());
+		Arrays.stream(userDTO.getRoles()).forEach(role->roles.add(roleRepo.findByName(role)));
 
 		BeanUtils.copyProperties(userDTO,user,"email");
 		user.setRoles(roles);
@@ -309,7 +313,7 @@ public class UserService implements IUserService {
 	private void sendVerificationEmail(User user, String siteURL) {
 		try {
 			String toAddress = user.getEmail();
-			System.out.println("Gửi tới: " + toAddress);
+			System.out.println("Send to: " + toAddress);
 			String fromAddress = "tuyencpu@gmail.com";
 			String senderName = "FRUIT SHOP";
 			String subject = "Please verify your registration";
@@ -332,11 +336,8 @@ public class UserService implements IUserService {
 			content = content.replace("[[URL]]", verifyURL);
 
 			helper.setText(content, true);
-			System.out.println("Chuân bị gửi mail");
 			mailSender.send(message);
-			System.out.println("Gửi mail xong");
 		} catch (UnsupportedEncodingException | MessagingException e) {
-			System.out.println("gui mail lỗi");
 			e.printStackTrace();
 		}
 
@@ -366,11 +367,10 @@ public class UserService implements IUserService {
 
 	public void resetFailedAttempts(String email) {
 		User u =getUserByEmail(email);
-		if(u.getFailedAttempt()>0){
+		if(u.getFailedAttempt()!=null&&u.getFailedAttempt()>0){
 			u.setFailedAttempt(0);
 			userRepo.save(u);
 		}
-
 	}
 
 	public void lock(User u) {

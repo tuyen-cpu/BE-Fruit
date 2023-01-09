@@ -1,6 +1,7 @@
 package com.example.befruit.repo.specs;
 
 import com.example.befruit.entity.*;
+import com.example.befruit.entity.Order;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OrderSpecification implements Specification<Bill> {
+public class OrderSpecification implements Specification<Order> {
 	private final List<Filter> list;
 
 	public OrderSpecification() {
@@ -21,7 +22,7 @@ public class OrderSpecification implements Specification<Bill> {
 	}
 
 	@Override
-	public Predicate toPredicate(Root<Bill> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+	public Predicate toPredicate(Root<Order> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
 
 		List<Predicate> predicates = new ArrayList<>();
 
@@ -68,7 +69,7 @@ public class OrderSpecification implements Specification<Bill> {
 					break;
 				case EQUAL:
 					if(criteria.getKey().equals("payment")){
-						Join<Bill, Payment> join = root.join("payment");
+						Join<Order, Payment> join = root.join("payment");
 						if(((Payment)criteria.getValue()).getStatus()!=null){
 							predicates.add(builder.equal(
 									join.get("status"), ((Payment)criteria.getValue()).getStatus()));
@@ -78,12 +79,12 @@ public class OrderSpecification implements Specification<Bill> {
 									join.get("paymentMethod"), ((Payment)criteria.getValue()).getPaymentMethod()));
 						}
 					}else if(criteria.getKey().equals("shippingStatusId")){
-						Join<Bill, ShippingStatus> join = root.join("shippingStatus");
+						Join<Order, ShippingStatus> join = root.join("shippingStatus");
 						predicates.add(builder.equal(
 								join.get("id"), criteria.getValue()));
 					}
 					else if(criteria.getKey().equals("userId")){
-						Join<Bill, User> join = root.join("user");
+						Join<Order, User> join = root.join("user");
 						predicates.add(builder.equal(
 								join.get("id"), criteria.getValue()));
 					}

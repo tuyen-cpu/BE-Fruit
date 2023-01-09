@@ -3,10 +3,8 @@ package com.example.befruit.service;
 import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.dto.request.OrderRequest;
 import com.example.befruit.dto.response.OrderResponse;
-import com.example.befruit.entity.Bill;
 import com.example.befruit.entity.ShippingStatus;
 import com.example.befruit.repo.specs.OrderSpecification;
-import com.example.befruit.repo.specs.ProductSpecification;
 import org.springframework.data.domain.Page;
 
 import java.util.Date;
@@ -24,8 +22,6 @@ public interface IOrderService {
 	Integer totalOrdersInDay(Date date);
 
 	Integer getRevenue();
-
-
 
 	Integer getRevenueMonth(Integer i);
 	 List<ShippingStatusStatistical> getStatisticalShippingStatus();

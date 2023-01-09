@@ -5,5 +5,6 @@ import com.example.befruit.dto.OrderDetailDTO;
 import java.util.List;
 
 public interface IOrderDetailService {
+	List<OrderDetailDTO> getAllByOrderIdAndUserId(Long orderId,Long userId);
 	List<OrderDetailDTO> getAllByOrderId(Long orderId);
 }

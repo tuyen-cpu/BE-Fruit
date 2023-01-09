@@ -30,5 +30,5 @@ public class Payment extends Base<String> implements Serializable {
 
 	@OneToOne(mappedBy = "payment")
 	@JsonIgnore
-	private Bill bill;
+	private Order bill;
 }

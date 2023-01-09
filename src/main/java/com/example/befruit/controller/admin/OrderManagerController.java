@@ -1,14 +1,19 @@
 package com.example.befruit.controller.admin;
 
+import com.example.befruit.dto.OrderDetailDTO;
 import com.example.befruit.dto.ShippingStatusStatistical;
 import com.example.befruit.dto.filter.OrderFilter;
 import com.example.befruit.dto.response.OrderResponse;
 import com.example.befruit.entity.*;
 import com.example.befruit.repo.specs.OrderSpecification;
+import com.example.befruit.sercurity.service.UserDetail;
+import com.example.befruit.service.IOrderDetailService;
 import com.example.befruit.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
@@ -20,7 +25,8 @@ import java.util.List;
 public class OrderManagerController {
 	@Autowired
 	private IOrderService orderService;
-
+	@Autowired
+	private IOrderDetailService orderDetailService;
 	@PostMapping("/update-status")
 	public ResponseEntity<ResponseObject> getAll(@RequestBody OrderResponse orderResponse){
 
@@ -121,7 +127,7 @@ public class OrderManagerController {
 	public ResponseEntity<ResponseObject> getRevenueLastMonth(){
 
 		try {
-			Integer total = orderService.getRevenueMonth(Calendar.getInstance().get(Calendar.MONTH));
+			Integer total = orderService.getRevenueMonth(Calendar.getInstance().get(Calendar.MONTH)==0?12:Calendar.getInstance().get(Calendar.MONTH));
 			return ResponseEntity.ok()
 					.body(new ResponseObject("ok", "Get total orders successfully!", total));
 		} catch (Exception e) {
@@ -151,6 +157,20 @@ public class OrderManagerController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));
+		}
+	}
+	@GetMapping("/{orderId}/order-detail")
+	public ResponseEntity<ResponseObject> getOrderDetailsById(@PathVariable(name ="orderId" ,required = false) Long orderId){
+		try{
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserDetail userDetail = (UserDetail) authentication.getPrincipal();
+
+			List<OrderDetailDTO> orderResponses = orderDetailService.getAllByOrderId(orderId);
+			return ResponseEntity.ok().body(new ResponseObject("ok","Get order detail successful!",orderResponses));
+
+		}catch (Exception e){
+			return ResponseEntity.badRequest().body(new ResponseObject("failed",e.getMessage(),""));
+
 		}
 	}
 	public static boolean isNumber(String text){

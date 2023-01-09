@@ -6,8 +6,6 @@ import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "bill")
-public class Bill extends Base<String> implements Serializable {
+public class Order extends Base<String> implements Serializable {
 
 	private Long shippingCost;
 	private Long total;

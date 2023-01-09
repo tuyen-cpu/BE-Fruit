@@ -20,9 +20,13 @@ public class OrderDetailService implements IOrderDetailService {
 	private OrderDetailConverter orderDetailConverter;
 
 	@Override
+	public List<OrderDetailDTO> getAllByOrderIdAndUserId(Long orderId,Long userId) {
+		List<OrderDetail> list = orderDetailRepo.findAllByBillIdAndUserId(orderId,userId);
+		return list.stream().map(e -> orderDetailConverter.convertToResponse(e)).collect(Collectors.toList());
+	}
+	@Override
 	public List<OrderDetailDTO> getAllByOrderId(Long orderId) {
 		List<OrderDetail> list = orderDetailRepo.findAllByBillId(orderId);
-
 		return list.stream().map(e -> orderDetailConverter.convertToResponse(e)).collect(Collectors.toList());
 	}
 }

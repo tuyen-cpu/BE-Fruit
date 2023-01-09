@@ -28,7 +28,7 @@ public class OrderDetail implements Serializable {
 	private Product product;
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(targetEntity = Bill.class)
+	@ManyToOne(targetEntity = Order.class)
 	@JoinColumn(name = "bill_id", nullable = false)
-	private Bill bill;
+	private Order bill;
 }

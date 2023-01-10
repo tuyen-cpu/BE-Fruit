@@ -42,7 +42,7 @@ public class AnalyticController {
 		try{
 			Page<RevenueDTO> revenueDTOPage =analyticService.getRevenueInWithDayMonthYearBetween(dayStart,dayEnd,monthStart,monthEnd,yearStart,yearEnd,page,size);
 			return ResponseEntity.ok()
-					.body(new ResponseObject("ok", "Get revenue "+ dayEnd+" successfully!", revenueDTOPage));
+					.body(new ResponseObject("ok", "Get revenue "+ dayStart +"/"+monthStart+"/"+yearStart+ "--"+ dayEnd +"/"+monthEnd+"/"+yearEnd+" successfully!", revenueDTOPage));
 		}catch (Exception e){
 			return ResponseEntity.badRequest()
 					.body(new ResponseObject("failed", e.getMessage(), ""));

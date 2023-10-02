@@ -31,7 +31,7 @@ public class UserDetailService implements UserDetailsService {
 		) {
 			throw new UsernameNotFoundException("Email " + email + " is not found");
 		}
-		if(!user.getEnabled()){
+		if(Boolean.FALSE.equals(user.getEnabled())){
 			throw new DisabledException("Email is not verify");
 		}
 		if(Objects.equals(user.getStatus(), EStatus.INACTIVE.getName())){

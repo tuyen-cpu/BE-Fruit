@@ -279,3 +279,8 @@ CREATE TABLE IF NOT EXISTS `fruit`.`cart` (
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+ALTER TABLE `fruit`.`user_role`
+    ADD PRIMARY KEY (`user_id`, `role_id`);
+;
+ALTER TABLE `fruit`.`product`
+    CHANGE COLUMN `description` `description` TEXT NULL DEFAULT NULL ;

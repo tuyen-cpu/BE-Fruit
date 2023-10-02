@@ -21,6 +21,7 @@ public class Product extends Base<String> implements Serializable {
 //	private Long id;
 	private String name;
 	private Long price;
+	@Column(columnDefinition = "TEXT")
 	private String description;
 	private Integer discount;
 	private Integer quantity;

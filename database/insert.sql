@@ -136,4 +136,10 @@ INSERT INTO `fruit`.`image` (`link`, `product_id`) VALUES ('chom-chom (1).webp',
 INSERT INTO `fruit`.`image` (`link`, `product_id`) VALUES ('chom-chom (2).webp', 14);
 INSERT INTO `fruit`.`image` (`link`, `product_id`) VALUES ('chom-chom (3).webp', 14);
 
-
+-- shipping status
+INSERT INTO `fruit`.`shipping_status` (`name`) VALUES ('VERIFIED');
+INSERT INTO `fruit`.`shipping_status` (`name`) VALUES ('UNVERIFIED');
+INSERT INTO `fruit`.`shipping_status` (`name`) VALUES ('DELIVERING');
+INSERT INTO `fruit`.`shipping_status` (`name`) VALUES ('DELIVERED');
+INSERT INTO `fruit`.`shipping_status` (`name`) VALUES ('CANCELED');
+INSERT INTO `fruit`.`shipping_status` (`name`) VALUES ('CANCELING');

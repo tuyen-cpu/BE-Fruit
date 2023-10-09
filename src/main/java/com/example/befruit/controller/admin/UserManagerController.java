@@ -45,7 +45,7 @@ public class UserManagerController {
 					.body(new ResponseObject("ok", "Get user successfully!", user));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", "Get failed!", ""));
+					.body(new ResponseObject("failed", "Get failed!", ""));
 		}
 
 	}
@@ -57,7 +57,7 @@ public class UserManagerController {
 					.body(new ResponseObject("ok", "Get user successfully!", user));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
-					.body(new ResponseObject("ok", "Get failed!", ""));
+					.body(new ResponseObject("failed", "Get failed!", ""));
 		}
 
 	}

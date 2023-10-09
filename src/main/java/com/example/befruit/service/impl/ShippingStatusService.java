@@ -6,6 +6,8 @@ import com.example.befruit.service.IShippingStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ShippingStatusService implements IShippingStatusService {
 	@Autowired
@@ -14,5 +16,10 @@ public class ShippingStatusService implements IShippingStatusService {
 	@Override
 	public ShippingStatus getByName(String name) {
 		return shippingStatusRepo.findByName(name);
+	}
+
+	@Override
+	public List<ShippingStatus> getAll() {
+		return shippingStatusRepo.findAll();
 	}
 }

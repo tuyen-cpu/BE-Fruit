@@ -45,7 +45,7 @@ public class ProductController {
 																																		 @RequestParam(name = "size", defaultValue = "10") int size) {
 		try {
 			Page<ProductResponse> products;
-			if (slug.equals("null")) {
+			if (slug.equals("null") || slug.equals("all")) {
 				products = productService.getAll(price, EStatus.ACTIVE.getName(), page, size);
 			} else {
 				products = productService.getAllByCategorySlug(slug, price, EStatus.ACTIVE.getName(), page, size);
